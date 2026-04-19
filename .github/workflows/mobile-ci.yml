@@ -35,6 +35,9 @@ jobs:
       - name: Run lint
         run: npm run lint --if-present
 
+      - name: Run format check
+        run: npm run format:check --if-present
+
       - name: Run typecheck
         run: npm run typecheck --if-present
 
