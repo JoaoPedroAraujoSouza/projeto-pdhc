@@ -280,6 +280,18 @@ O projeto será organizado com:
 
 > Observação: durante o desenvolvimento mobile, a API deve ser consumida pelo IP da máquina hospedeira, e não por `localhost`, quando o app estiver rodando em dispositivo físico.
 
+### Scripts iniciais (raiz)
+
+- `npm run setup`: instala dependências de backend e mobile
+- `npm run dev:backend`: inicia backend em modo watch
+- `npm run dev:mobile`: inicia app mobile
+- `npm run lint`: executa lint em backend e mobile
+- `npm run format`: aplica Prettier em backend e mobile
+- `npm run format:check`: valida formatação em backend e mobile
+- `npm run typecheck`: valida TypeScript em backend e mobile
+- `npm run test`: executa testes unitários do backend
+- `npm run test:e2e`: executa testes e2e do backend
+
 ## Autor
 
 Projeto desenvolvido como entrega técnica para processo seletivo, com foco em demonstrar domínio de backend, integração full stack, testes, documentação e organização de engenharia.

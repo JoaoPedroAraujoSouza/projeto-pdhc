@@ -1,0 +1,22 @@
+{
+  "name": "projeto-pdhc",
+  "private": true,
+  "scripts": {
+    "setup": "npm --prefix backend ci && npm --prefix mobile ci",
+    "dev": "npm run dev:backend",
+    "dev:backend": "npm --prefix backend run start:dev",
+    "dev:mobile": "npm --prefix mobile run start",
+    "build": "npm run build:backend",
+    "build:backend": "npm --prefix backend run build",
+    "lint": "npm run lint:backend && npm run lint:mobile",
+    "lint:backend": "npm --prefix backend run lint",
+    "lint:mobile": "npm --prefix mobile run lint",
+    "lint:fix": "npm --prefix backend run lint:fix && npm --prefix mobile run lint:fix",
+    "format": "npm --prefix backend run format && npm --prefix mobile run format",
+    "format:check": "npm --prefix backend run format:check && npm --prefix mobile run format:check",
+    "typecheck": "npm --prefix backend run typecheck && npm --prefix mobile run typecheck",
+    "test": "npm run test:backend",
+    "test:backend": "npm --prefix backend run test",
+    "test:e2e": "npm --prefix backend run test:e2e"
+  }
+}
