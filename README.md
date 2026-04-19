@@ -1,0 +1,285 @@
+# Projeto PDHC
+
+Aplicação mobile de agendamento hospitalar simplificado, voltada ao uso administrativo, com backend em NestJS, autenticação via Supabase local, cadastro de pacientes, profissionais e especialidades, além de criação e gerenciamento de consultas com regras de negócio, documentação e testes.
+
+## Objetivo
+
+Este projeto foi pensado para demonstrar:
+
+- arquitetura backend organizada e escalável
+- integração entre React Native, NestJS e Supabase
+- modelagem de domínio aderente a um cenário hospitalar
+- boas práticas de documentação, testes e gestão de projeto
+- foco em fluxo administrativo realista, sem complexidade clínica desnecessária
+
+## Escopo do MVP
+
+### Incluído
+
+- autenticação com Supabase Auth em ambiente local
+- validação do token no backend NestJS
+- cadastro e listagem de especialidades
+- cadastro, edição, detalhe e listagem de profissionais
+- cadastro, edição, detalhe e listagem de pacientes
+- criação, listagem, detalhe e gerenciamento de agendamentos
+- ações de confirmar, remarcar, cancelar e concluir consulta
+- dashboard simples do dia
+- filtros por data, status, profissional e especialidade
+- documentação técnica
+- testes estratégicos no backend
+- organização via GitHub Projects, issues e sub-issues
+
+### Fora do escopo
+
+- portal do paciente
+- múltiplos perfis de acesso
+- prontuário clínico
+- notificações
+- tempo real
+- integração com sistemas externos
+- exclusão física de registros
+
+## Público-alvo
+
+Equipe administrativa hospitalar responsável por cadastrar pacientes, manter profissionais e organizar a agenda de atendimentos.
+
+## Stack
+
+### Mobile
+- React Native
+- Expo
+- TypeScript
+
+### Backend
+- NestJS
+- TypeScript
+- PostgreSQL (via Supabase local)
+- Swagger / OpenAPI
+- Jest
+
+### Infra e produtividade
+- Docker
+- Supabase CLI
+- GitHub Projects
+- GitHub Actions
+- ESLint
+- Prettier
+
+## Arquitetura
+
+```text
+mobile (React Native + Expo)
+        |
+        | Bearer Token
+        v
+backend (NestJS + regras de negócio)
+        |
+        v
+PostgreSQL + Auth (Supabase local)
+```
+
+### Decisões principais
+- autenticação delegada ao Supabase para reduzir complexidade inicial
+- backend NestJS focado em domínio, validação, regras e contratos de API
+- duração fixa implícita de 30 minutos por consulta
+- uma especialidade por profissional no MVP
+- cancelamento por mudança de status, preservando histórico
+
+## Entidades principais
+
+### Specialty
+- id
+- name
+- createdAt
+
+### Professional
+- id
+- fullName
+- specialtyId
+- createdAt
+- updatedAt
+
+### Patient
+- id
+- fullName
+- cpf
+- birthDate
+- phone
+- createdAt
+- updatedAt
+
+### Appointment
+- id
+- patientId
+- professionalId
+- specialtyId
+- startAt
+- status
+- notes
+- createdAt
+- updatedAt
+
+### Status do agendamento
+- SCHEDULED
+- CONFIRMED
+- CANCELLED
+- COMPLETED
+
+## Regras de negócio
+
+- não permitir agendamento no passado
+- não permitir conflito de horário para o mesmo profissional
+- cada profissional pertence a uma única especialidade
+- toda consulta deve estar associada a paciente e profissional válidos
+- a especialidade do agendamento deve corresponder à do profissional
+- cancelamento preserva histórico
+- remarcação revalida conflito e data
+- conclusão só pode ocorrer em consulta ativa
+- toda consulta possui duração implícita de 30 minutos
+
+## Estrutura do repositório
+
+```text
+hospagenda/
+  backend/
+  mobile/
+  docs/
+  .github/
+```
+
+## Estrutura esperada do backend
+
+```text
+backend/
+  src/
+    modules/
+      auth/
+      specialties/
+      professionals/
+      patients/
+      appointments/
+      dashboard/
+    common/
+```
+
+## Estrutura esperada do mobile
+
+```text
+mobile/
+  src/
+    screens/
+    components/
+    services/
+    hooks/
+    navigation/
+    types/
+    utils/
+    constants/
+```
+
+## Endpoints do MVP
+
+### Auth
+- `GET /auth/me`
+
+### Specialties
+- `POST /specialties`
+- `GET /specialties`
+
+### Professionals
+- `POST /professionals`
+- `GET /professionals`
+- `GET /professionals/:id`
+- `PATCH /professionals/:id`
+
+### Patients
+- `POST /patients`
+- `GET /patients`
+- `GET /patients/:id`
+- `PATCH /patients/:id`
+
+### Appointments
+- `POST /appointments`
+- `GET /appointments`
+- `GET /appointments/:id`
+- `PATCH /appointments/:id/confirm`
+- `PATCH /appointments/:id/reschedule`
+- `PATCH /appointments/:id/cancel`
+- `PATCH /appointments/:id/complete`
+
+### Dashboard
+- `GET /dashboard/today`
+
+## Fluxos principais
+
+1. usuário administrativo autentica no app
+2. app recebe token do Supabase
+3. app envia token para API NestJS
+4. backend valida o token e libera rotas protegidas
+5. usuário cadastra paciente, profissional e especialidade
+6. usuário cria e gerencia agendamentos
+7. dashboard apresenta o resumo operacional do dia
+
+## Estratégia de testes
+
+### Unitários
+- criação de consulta válida
+- bloqueio de consulta no passado
+- bloqueio de conflito de horário
+- confirmação, cancelamento e conclusão de consulta
+- remarcação com revalidação das regras
+
+### Integração
+- rota protegida com token válido
+- criação de consulta autenticada
+- erro em conflito de horário
+- listagem com filtro por data
+
+## Gestão do projeto
+
+O projeto será organizado com:
+- GitHub Projects
+- parent issues por fase e área
+- sub-issues por tarefa executável
+- pipeline inicial com GitHub Actions para lint, build e testes
+
+## Documentação planejada
+
+- `docs/product-overview.md`
+- `docs/architecture.md`
+- `docs/api-contract.md`
+- `docs/testing-strategy.md`
+- `docs/delivery-plan.md`
+- `docs/internal-execution-guide.md`
+
+## Roadmap pós-MVP
+
+- portal do paciente
+- cancelamento pelo paciente
+- múltiplos perfis de acesso
+- disponibilidade médica avançada
+- notificações
+- integração com calendário
+- dashboard mais analítico
+
+## Como rodar localmente
+
+### Pré-requisitos
+- Node.js
+- Docker
+- Supabase CLI
+- Expo CLI ou ambiente equivalente
+- npm ou pnpm
+
+### Etapas gerais
+1. subir o Supabase local
+2. configurar variáveis de ambiente do backend e mobile
+3. iniciar o backend NestJS
+4. iniciar o app mobile
+5. autenticar e validar o fluxo ponta a ponta
+
+> Observação: durante o desenvolvimento mobile, a API deve ser consumida pelo IP da máquina hospedeira, e não por `localhost`, quando o app estiver rodando em dispositivo físico.
+
+## Autor
+
+Projeto desenvolvido como entrega técnica para processo seletivo, com foco em demonstrar domínio de backend, integração full stack, testes, documentação e organização de engenharia.
