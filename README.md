@@ -283,8 +283,12 @@ O projeto será organizado com:
 ### Scripts iniciais (raiz)
 
 - `npm run setup`: instala dependências de backend e mobile
+- `npm run dev` ou `npm run dev:all`: sobe Supabase local e roda backend + mobile juntos
 - `npm run dev:backend`: inicia backend em modo watch
 - `npm run dev:mobile`: inicia app mobile
+- `npm run supabase:start`: sobe os containers do Supabase local
+- `npm run supabase:status`: exibe status e credenciais locais do Supabase
+- `npm run supabase:stop`: para os containers do Supabase local
 - `npm run lint`: executa lint em backend e mobile
 - `npm run format`: aplica Prettier em backend e mobile
 - `npm run format:check`: valida formatação em backend e mobile

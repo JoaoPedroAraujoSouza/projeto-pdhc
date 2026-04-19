@@ -3,9 +3,13 @@
   "private": true,
   "scripts": {
     "setup": "npm --prefix backend ci && npm --prefix mobile ci",
-    "dev": "npm run dev:backend",
+    "dev": "npm run dev:all",
+    "dev:all": "npm run supabase:start && concurrently -k -n backend,mobile -c cyan,magenta \"npm run dev:backend\" \"npm run dev:mobile\"",
     "dev:backend": "npm --prefix backend run start:dev",
     "dev:mobile": "npm --prefix mobile run start",
+    "supabase:start": "npx supabase@latest start",
+    "supabase:status": "npx supabase@latest status",
+    "supabase:stop": "npx supabase@latest stop",
     "build": "npm run build:backend",
     "build:backend": "npm --prefix backend run build",
     "lint": "npm run lint:backend && npm run lint:mobile",
@@ -18,5 +22,8 @@
     "test": "npm run test:backend",
     "test:backend": "npm --prefix backend run test",
     "test:e2e": "npm --prefix backend run test:e2e"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
