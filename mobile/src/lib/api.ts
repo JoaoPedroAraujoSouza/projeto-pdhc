@@ -1,5 +1,5 @@
-import axios from "axios";
-import { supabase } from "@/lib/supabase";
+import axios from 'axios';
+import { supabase } from '@/lib/supabase';
 
 const api = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
@@ -22,7 +22,7 @@ api.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 api.interceptors.response.use(
@@ -31,14 +31,14 @@ api.interceptors.response.use(
     const responseMessage =
       error?.response?.data?.message ||
       error?.response?.data?.error ||
-      "Não foi possível concluir a requisição.";
+      'Não foi possível concluir a requisição.';
 
     const normalizedMessage = Array.isArray(responseMessage)
-      ? responseMessage.join(", ")
+      ? responseMessage.join(', ')
       : responseMessage;
 
     return Promise.reject(new Error(normalizedMessage));
-  }
+  },
 );
 
 export { api };

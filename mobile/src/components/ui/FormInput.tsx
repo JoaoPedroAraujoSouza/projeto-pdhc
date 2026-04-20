@@ -1,4 +1,4 @@
-import React, { forwardRef, useMemo, useState } from "react";
+import React, { forwardRef, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,9 @@ import {
   TextInputProps,
   StyleSheet,
   TouchableOpacity,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { colors } from "@/styles/colors";
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { colors } from '@/styles/colors';
 
 type FormInputProps = TextInputProps & {
   label: string;
@@ -32,7 +32,9 @@ export const FormInput = forwardRef<TextInput, FormInputProps>(
       <View style={styles.container}>
         <Text style={styles.label}>{label}</Text>
 
-        <View style={[styles.inputWrapper, errorMessage ? styles.inputError : null]}>
+        <View
+          style={[styles.inputWrapper, errorMessage ? styles.inputError : null]}
+        >
           <TextInput
             ref={ref}
             placeholderTextColor={colors.textMuted}
@@ -44,11 +46,13 @@ export const FormInput = forwardRef<TextInput, FormInputProps>(
           {isPasswordField ? (
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => setIsPasswordVisible((currentValue) => !currentValue)}
+              onPress={() =>
+                setIsPasswordVisible((currentValue) => !currentValue)
+              }
               style={styles.iconButton}
             >
               <Ionicons
-                name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
+                name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
                 size={20}
                 color={colors.textMuted}
               />
@@ -61,7 +65,7 @@ export const FormInput = forwardRef<TextInput, FormInputProps>(
         ) : null}
       </View>
     );
-  }
+  },
 );
 
 const styles = StyleSheet.create({
@@ -70,7 +74,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
     color: colors.text,
     marginLeft: 2,
   },
@@ -80,8 +84,8 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 14,
     minHeight: 52,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   input: {
     flex: 1,
@@ -93,8 +97,8 @@ const styles = StyleSheet.create({
   iconButton: {
     width: 44,
     height: 44,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 2,
   },
   inputError: {

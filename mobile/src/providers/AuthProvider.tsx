@@ -1,6 +1,6 @@
-import React, { createContext, useEffect, useMemo, useState } from "react";
-import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
+import React, { createContext, useEffect, useMemo, useState } from 'react';
+import { Session, User } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
 type AuthContextData = {
   session: Session | null;
@@ -9,7 +9,9 @@ type AuthContextData = {
   signOut: () => Promise<void>;
 };
 
-export const AuthContext = createContext<AuthContextData | undefined>(undefined);
+export const AuthContext = createContext<AuthContextData | undefined>(
+  undefined,
+);
 
 type AuthProviderProps = {
   children: React.ReactNode;
@@ -64,7 +66,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isLoading,
       signOut,
     }),
-    [session, isLoading]
+    [session, isLoading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

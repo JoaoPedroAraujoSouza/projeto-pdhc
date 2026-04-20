@@ -1,6 +1,6 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { colors } from "@/styles/colors";
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { colors } from '@/styles/colors';
 
 type AuthHeaderProps = {
   title: string;
@@ -23,19 +23,19 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   badge: {
-    alignSelf: "flex-start",
-    backgroundColor: "#E6EEF7",
+    alignSelf: 'flex-start',
+    backgroundColor: '#E6EEF7',
     color: colors.primary,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
     fontSize: 12,
-    fontWeight: "700",
-    overflow: "hidden",
+    fontWeight: '700',
+    overflow: 'hidden',
   },
   title: {
     fontSize: 30,
-    fontWeight: "700",
+    fontWeight: '700',
     color: colors.text,
     lineHeight: 36,
   },

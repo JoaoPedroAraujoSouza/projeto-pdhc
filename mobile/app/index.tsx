@@ -1,7 +1,7 @@
-import { Redirect } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
-import { useAuth } from "@/hooks/useAuth";
-import { colors } from "@/styles/colors";
+import { Redirect } from 'expo-router';
+import { ActivityIndicator, View } from 'react-native';
+import { useAuth } from '@/hooks/useAuth';
+import { colors } from '@/styles/colors';
 
 export default function IndexScreen() {
   const { session, isLoading } = useAuth();
@@ -11,8 +11,8 @@ export default function IndexScreen() {
       <View
         style={{
           flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
+          alignItems: 'center',
+          justifyContent: 'center',
           backgroundColor: colors.background,
         }}
       >

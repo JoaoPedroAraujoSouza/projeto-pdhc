@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { api } from '@/lib/api';
 
 type MeResponse = {
   id: string;
@@ -6,6 +6,6 @@ type MeResponse = {
 };
 
 export async function getMe() {
-  const response = await api.get<MeResponse>("/auth/me");
+  const response = await api.get<MeResponse>('/auth/me');
   return response.data;
 }

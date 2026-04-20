@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
 import {
   TouchableOpacity,
   Text,
   StyleSheet,
   ActivityIndicator,
   TouchableOpacityProps,
-} from "react-native";
-import { colors } from "@/styles/colors";
+} from 'react-native';
+import { colors } from '@/styles/colors';
 
 type AppButtonProps = TouchableOpacityProps & {
   title: string;
@@ -42,9 +42,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 14,
     height: 52,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#0B1723",
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#0B1723',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
     shadowRadius: 14,
@@ -56,6 +56,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.surface,
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 });

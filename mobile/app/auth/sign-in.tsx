@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,18 +7,18 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
-} from "react-native";
-import { Link, router } from "expo-router";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Toast from "react-native-toast-message";
+} from 'react-native';
+import { Link, router } from 'expo-router';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Toast from 'react-native-toast-message';
 
-import { AuthHeader } from "@/components/auth/AuthHeader";
-import { AppButton } from "@/components/ui/AppButton";
-import { FormInput } from "@/components/ui/FormInput";
-import { signInSchema, SignInSchemaData } from "@/schemas/auth/sign-in-schema";
-import { signInWithEmail } from "@/services/auth/sign-in";
-import { colors } from "@/styles/colors";
+import { AuthHeader } from '@/components/auth/AuthHeader';
+import { AppButton } from '@/components/ui/AppButton';
+import { FormInput } from '@/components/ui/FormInput';
+import { signInSchema, SignInSchemaData } from '@/schemas/auth/sign-in-schema';
+import { signInWithEmail } from '@/services/auth/sign-in';
+import { colors } from '@/styles/colors';
 
 export default function SignInScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,10 +30,10 @@ export default function SignInScreen() {
   } = useForm<SignInSchemaData>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
-    mode: "onSubmit",
+    mode: 'onSubmit',
   });
 
   async function handleSignIn(data: SignInSchemaData) {
@@ -42,16 +42,16 @@ export default function SignInScreen() {
 
       await signInWithEmail(data);
 
-      router.replace("/(protected)/dashboard");
+      router.replace('/(protected)/dashboard');
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : "Não foi possível concluir o login.";
+          : 'Não foi possível concluir o login.';
 
       Toast.show({
-        type: "error",
-        text1: "Erro no login",
+        type: 'error',
+        text1: 'Erro no login',
         text2: message,
       });
     } finally {
@@ -62,7 +62,7 @@ export default function SignInScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.keyboardView}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingHorizontal: 20,
     paddingVertical: 32,
   },
@@ -147,8 +147,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 24,
     borderWidth: 1,
-    borderColor: "#E8EDF3",
-    shadowColor: "#102030",
+    borderColor: '#E8EDF3',
+    shadowColor: '#102030',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 18,
@@ -159,9 +159,9 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginTop: 24,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 6,
   },
   footerText: {
@@ -171,6 +171,6 @@ const styles = StyleSheet.create({
   footerLink: {
     color: colors.primary,
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 });

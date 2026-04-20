@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,18 +7,18 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
-} from "react-native";
-import { Link, router } from "expo-router";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Toast from "react-native-toast-message";
+} from 'react-native';
+import { Link, router } from 'expo-router';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Toast from 'react-native-toast-message';
 
-import { AuthHeader } from "@/components/auth/AuthHeader";
-import { AppButton } from "@/components/ui/AppButton";
-import { FormInput } from "@/components/ui/FormInput";
-import { signUpSchema, SignUpSchemaData } from "@/schemas/auth/sign-up-schema";
-import { signUpWithEmail } from "@/services/auth/sign-up";
-import { colors } from "@/styles/colors";
+import { AuthHeader } from '@/components/auth/AuthHeader';
+import { AppButton } from '@/components/ui/AppButton';
+import { FormInput } from '@/components/ui/FormInput';
+import { signUpSchema, SignUpSchemaData } from '@/schemas/auth/sign-up-schema';
+import { signUpWithEmail } from '@/services/auth/sign-up';
+import { colors } from '@/styles/colors';
 
 export default function SignUpScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,12 +30,12 @@ export default function SignUpScreen() {
   } = useForm<SignUpSchemaData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
     },
-    mode: "onSubmit",
+    mode: 'onSubmit',
   });
 
   async function handleSignUp(data: SignUpSchemaData) {
@@ -45,23 +45,23 @@ export default function SignUpScreen() {
       await signUpWithEmail(data);
 
       Toast.show({
-        type: "success",
-        text1: "Cadastro realizado",
-        text2: "Sua conta foi criada com sucesso. Faça login para continuar.",
+        type: 'success',
+        text1: 'Cadastro realizado',
+        text2: 'Sua conta foi criada com sucesso. Faça login para continuar.',
       });
 
       setTimeout(() => {
-        router.replace("/auth/sign-in");
+        router.replace('/auth/sign-in');
       }, 1200);
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : "Não foi possível concluir o cadastro.";
+          : 'Não foi possível concluir o cadastro.';
 
       Toast.show({
-        type: "error",
-        text1: "Erro no cadastro",
+        type: 'error',
+        text1: 'Erro no cadastro',
         text2: message,
       });
     } finally {
@@ -72,7 +72,7 @@ export default function SignUpScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.keyboardView}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingHorizontal: 20,
     paddingVertical: 32,
   },
@@ -188,8 +188,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 24,
     borderWidth: 1,
-    borderColor: "#E8EDF3",
-    shadowColor: "#102030",
+    borderColor: '#E8EDF3',
+    shadowColor: '#102030',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 18,
@@ -200,9 +200,9 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginTop: 24,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 6,
   },
   footerText: {
@@ -212,6 +212,6 @@ const styles = StyleSheet.create({
   footerLink: {
     color: colors.primary,
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 });
