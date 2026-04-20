@@ -1,0 +1,7 @@
+# Root dependencies
+/node_modules
+
+# Root logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

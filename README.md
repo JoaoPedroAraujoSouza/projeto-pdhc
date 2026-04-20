@@ -283,14 +283,31 @@ O projeto será organizado com:
 ### Scripts iniciais (raiz)
 
 - `npm run setup`: instala dependências de backend e mobile
+- `npm run dev` ou `npm run dev:all`: sobe Supabase local e roda backend + mobile juntos
+- `npm run dev:android`: sobe Supabase local e roda backend + mobile no Android Emulator
+- `npm run dev:services`: sobe Supabase local e roda apenas backend (ideal para Swagger)
 - `npm run dev:backend`: inicia backend em modo watch
 - `npm run dev:mobile`: inicia app mobile
+- `npm run dev:mobile:emulator`: inicia app mobile direto no Android Emulator
+- `npm run dev:mobile:android`: tenta abrir o app automaticamente no Android Emulator
+- `npm run supabase:start`: sobe os containers do Supabase local
+- `npm run supabase:status`: exibe status e credenciais locais do Supabase
+- `npm run supabase:stop`: para os containers do Supabase local
 - `npm run lint`: executa lint em backend e mobile
 - `npm run format`: aplica Prettier em backend e mobile
 - `npm run format:check`: valida formatação em backend e mobile
 - `npm run typecheck`: valida TypeScript em backend e mobile
 - `npm run test`: executa testes unitários do backend
 - `npm run test:e2e`: executa testes e2e do backend
+
+### Fluxo recomendado (Android Studio)
+
+1. `npm run dev:services`
+2. abrir Swagger no backend (`http://localhost:3000/docs`)
+3. em outro terminal, `npm run dev:mobile:emulator`
+4. com o emulador já aberto, pressione `a` no terminal do Expo (ou use `npm run dev:mobile:android`)
+
+> No Android Emulator, o app usa `10.0.2.2` para acessar serviços do host (`backend` e `supabase`).
 
 ## Autor
 

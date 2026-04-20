@@ -9,9 +9,15 @@ on:
     paths:
       - "backend/**"
       - ".github/workflows/backend-ci.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  ci:
+  quality:
+    name: Backend Quality
     runs-on: ubuntu-latest
 
     defaults:
@@ -33,13 +39,45 @@ jobs:
         run: npm ci
 
       - name: Run lint
-        run: npm run lint --if-present
+        run: npm run lint
 
       - name: Run format check
-        run: npm run format:check --if-present
+        run: npm run format:check
 
-      - name: Run tests
-        run: npm run test --if-present
+      - name: Run typecheck
+        run: npm run typecheck
 
-      - name: Build application
-        run: npm run build --if-present
+  tests:
+    name: Backend Tests (${{ matrix.suite }})
+    runs-on: ubuntu-latest
+    needs: quality
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [unit, e2e]
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        if: matrix.suite == 'unit'
+        run: npm run test -- --runInBand
+
+      - name: Run e2e tests
+        if: matrix.suite == 'e2e'
+        run: npm run test:e2e
