@@ -5,7 +5,9 @@
   "scripts": {
     "start": "expo start --port 8082",
     "reset-project": "node ./scripts/reset-project.js",
+    "emulator": "expo start --localhost --port 8082",
     "android": "expo start --android --port 8082",
+    "android:emulator": "expo start --android --localhost --port 8082",
     "ios": "expo start --ios --port 8082",
     "web": "expo start --web --port 8082",
     "lint": "expo lint",
