@@ -3,6 +3,8 @@ import { api } from '@/lib/api';
 type MeResponse = {
   id: string;
   email: string;
+  role?: string;
+  userMetadata?: Record<string, unknown>;
 };
 
 export async function getMe() {
