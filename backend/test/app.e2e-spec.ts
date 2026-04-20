@@ -3,6 +3,7 @@ import {
   beforeAll,
   beforeEach,
   describe,
+  expect,
   it,
   jest,
 } from '@jest/globals';
@@ -70,8 +71,8 @@ describe('App (e2e)', () => {
       .expect(401);
   });
 
-  it('/api/auth/me (GET) returns authenticated user payload', () => {
-    return request(app.getHttpServer())
+  it('/api/auth/me (GET) returns authenticated user payload', async () => {
+    await request(app.getHttpServer())
       .get('/api/auth/me')
       .set('Authorization', 'Bearer valid-token')
       .expect(200)
@@ -82,6 +83,8 @@ describe('App (e2e)', () => {
         appMetadata: { provider: 'email' },
         userMetadata: { name: 'Ana' },
       });
+
+    expect(getAuthenticatedUserMock).toHaveBeenCalledWith('valid-token');
   });
 
   afterAll(async () => {
