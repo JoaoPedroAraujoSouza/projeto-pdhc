@@ -1,10 +1,26 @@
 import axios from 'axios';
 import { supabase } from '@/lib/supabase';
 
+const apiBaseUrl = buildApiBaseUrl(process.env.EXPO_PUBLIC_API_URL);
+
 const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL,
+  baseURL: apiBaseUrl,
   timeout: 10000,
 });
+
+function buildApiBaseUrl(baseUrl?: string) {
+  if (!baseUrl) {
+    return undefined;
+  }
+
+  const normalizedBaseUrl = baseUrl.trim().replace(/\/+$/, '');
+
+  if (normalizedBaseUrl.endsWith('/api')) {
+    return normalizedBaseUrl;
+  }
+
+  return `${normalizedBaseUrl}/api`;
+}
 
 api.interceptors.request.use(
   async (config) => {

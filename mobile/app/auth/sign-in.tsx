@@ -42,7 +42,7 @@ export default function SignInScreen() {
 
       await signInWithEmail(data);
 
-      router.replace('/(protected)/dashboard');
+      router.replace('../(protected)/dashboard');
     } catch (error) {
       const message =
         error instanceof Error

@@ -3,7 +3,7 @@ import type { Session, User } from '@supabase/supabase-js';
 import { Redirect, Stack } from 'expo-router';
 import type { ReactElement } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import ProtectedLayout from './_layout';
+import ProtectedLayout from '../../app/(protected)/_layout';
 
 jest.mock('@/hooks/useAuth', () => ({
   useAuth: jest.fn(),
