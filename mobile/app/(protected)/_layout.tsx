@@ -1,9 +1,9 @@
-import { Redirect } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 import { useAuth } from "@/hooks/useAuth";
 import { colors } from "@/styles/colors";
 
-export default function IndexScreen() {
+export default function ProtectedLayout() {
   const { session, isLoading } = useAuth();
 
   if (isLoading) {
@@ -25,5 +25,5 @@ export default function IndexScreen() {
     return <Redirect href="/auth/sign-in" />;
   }
 
-  return <Redirect href="/(protected)/dashboard" />;
+  return <Stack screenOptions={{ headerShown: false }} />;
 }

@@ -1,13 +1,12 @@
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import { Stack } from "expo-router";
+import { AuthProvider } from "@/providers/AuthProvider";
+import Toast from "react-native-toast-message";
 
 export default function RootLayout() {
   return (
-    <>
-      <Stack>
-        <Stack.Screen name="index" options={{ title: 'PDHC' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </>
+    <AuthProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+      <Toast />
+    </AuthProvider>
   );
 }
