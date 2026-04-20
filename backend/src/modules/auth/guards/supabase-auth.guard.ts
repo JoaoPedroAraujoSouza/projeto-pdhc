@@ -19,9 +19,8 @@ export class SupabaseAuthGuard implements CanActivate {
       throw new UnauthorizedException('Formato de token inválido.');
     }
 
-    const user = await this.supabaseAuthService.getAuthenticatedUser(
-      accessToken
-    );
+    const user =
+      await this.supabaseAuthService.getAuthenticatedUser(accessToken);
 
     request.user = user;
     request.accessToken = accessToken;

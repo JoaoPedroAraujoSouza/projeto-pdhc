@@ -2,11 +2,11 @@ import { Controller, Get } from '@nestjs/common';
 
 @Controller('health')
 export class HealthController {
-    @Get()
-    check() {
-        return {
-            status: 'ok',
-            service: 'pdhc-backend',
-        };
-    }
+  @Get()
+  check() {
+    return {
+      status: 'ok',
+      service: 'pdhc-backend',
+    };
+  }
 }

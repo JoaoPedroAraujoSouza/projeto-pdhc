@@ -8,7 +8,7 @@ import type { AuthenticatedUser } from '../interfaces/authenticated-user.interfa
 
 export const currentUserFactory = (
   _data: unknown,
-  context: ExecutionContext
+  context: ExecutionContext,
 ): AuthenticatedUser => {
   const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
 

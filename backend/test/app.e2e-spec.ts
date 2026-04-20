@@ -3,7 +3,6 @@ import {
   beforeAll,
   beforeEach,
   describe,
-  expect,
   it,
   jest,
 } from '@jest/globals';
@@ -18,9 +17,8 @@ import type { AuthenticatedUser } from '../src/modules/auth/interfaces/authentic
 
 describe('App (e2e)', () => {
   let app: INestApplication<App>;
-  const getAuthenticatedUserMock = jest.fn<
-    (accessToken: string) => Promise<AuthenticatedUser>
-  >();
+  const getAuthenticatedUserMock =
+    jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>();
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -39,29 +37,26 @@ describe('App (e2e)', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    getAuthenticatedUserMock.mockImplementation(async (token: string) => {
+    getAuthenticatedUserMock.mockImplementation((token: string) => {
       if (token !== 'valid-token') {
         throw new UnauthorizedException('Token inválido ou expirado.');
       }
 
-      return {
+      return Promise.resolve({
         id: 'user-id',
         email: 'user@example.com',
         role: 'authenticated',
         appMetadata: { provider: 'email' },
         userMetadata: { name: 'Ana' },
-      };
+      });
     });
   });
 
   it('/api/health (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/api/health')
-      .expect(200)
-      .expect({
-        status: 'ok',
-        service: 'pdhc-backend',
-      });
+    return request(app.getHttpServer()).get('/api/health').expect(200).expect({
+      status: 'ok',
+      service: 'pdhc-backend',
+    });
   });
 
   it('/api/auth/me (GET) returns 401 without authorization header', () => {

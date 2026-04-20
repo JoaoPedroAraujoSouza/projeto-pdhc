@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import type { AuthenticatedUser } from '../interfaces/authenticated-user.interface';
 
 @Injectable()
 export class SupabaseAuthService {
-  private readonly supabase: SupabaseClient;
+  private readonly supabase: ReturnType<typeof createClient>;
 
   constructor() {
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -12,7 +12,7 @@ export class SupabaseAuthService {
 
     if (!supabaseUrl || !supabaseAnonKey) {
       throw new Error(
-        'SUPABASE_URL and SUPABASE_ANON_KEY must be set in environment variables.'
+        'SUPABASE_URL and SUPABASE_ANON_KEY must be set in environment variables.',
       );
     }
 

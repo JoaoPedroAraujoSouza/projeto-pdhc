@@ -5,7 +5,9 @@ import type { AuthenticatedRequest } from '../interfaces/authenticated-request.i
 import type { AuthenticatedUser } from '../interfaces/authenticated-user.interface';
 
 describe('currentUserFactory', () => {
-  const createExecutionContext = (request: AuthenticatedRequest): ExecutionContext => {
+  const createExecutionContext = (
+    request: AuthenticatedRequest,
+  ): ExecutionContext => {
     return {
       switchToHttp: () => ({
         getRequest: () => request,
@@ -26,7 +28,10 @@ describe('currentUserFactory', () => {
       user,
     } as AuthenticatedRequest;
 
-    const result = currentUserFactory(undefined, createExecutionContext(request));
+    const result = currentUserFactory(
+      undefined,
+      createExecutionContext(request),
+    );
 
     expect(result).toEqual(user);
   });
@@ -35,7 +40,7 @@ describe('currentUserFactory', () => {
     const request = {} as AuthenticatedRequest;
 
     expect(() =>
-      currentUserFactory(undefined, createExecutionContext(request))
+      currentUserFactory(undefined, createExecutionContext(request)),
     ).toThrow(UnauthorizedException);
   });
 });

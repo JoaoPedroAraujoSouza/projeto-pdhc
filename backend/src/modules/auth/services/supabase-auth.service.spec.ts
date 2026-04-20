@@ -1,4 +1,11 @@
-import { afterAll, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import {
+  afterAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from '@jest/globals';
 import { UnauthorizedException } from '@nestjs/common';
 import { createClient } from '@supabase/supabase-js';
 import { SupabaseAuthService } from './supabase-auth.service';
@@ -16,9 +23,8 @@ describe('SupabaseAuthService', () => {
   };
 
   const createClientMock = createClient as unknown as jest.Mock;
-  const getUserMock = jest.fn<
-    (accessToken: string) => Promise<SupabaseGetUserResult>
-  >();
+  const getUserMock =
+    jest.fn<(accessToken: string) => Promise<SupabaseGetUserResult>>();
   const originalSupabaseUrl = process.env.SUPABASE_URL;
   const originalSupabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
@@ -73,7 +79,7 @@ describe('SupabaseAuthService', () => {
           persistSession: false,
           autoRefreshToken: false,
         },
-      }
+      },
     );
 
     expect(result).toEqual({
@@ -98,7 +104,7 @@ describe('SupabaseAuthService', () => {
     const service = new SupabaseAuthService();
 
     await expect(service.getAuthenticatedUser('bad-token')).rejects.toThrow(
-      UnauthorizedException
+      UnauthorizedException,
     );
   });
 
@@ -106,7 +112,7 @@ describe('SupabaseAuthService', () => {
     delete process.env.SUPABASE_URL;
 
     expect(() => new SupabaseAuthService()).toThrow(
-      'SUPABASE_URL and SUPABASE_ANON_KEY must be set in environment variables.'
+      'SUPABASE_URL and SUPABASE_ANON_KEY must be set in environment variables.',
     );
   });
 });

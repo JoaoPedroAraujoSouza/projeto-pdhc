@@ -6,9 +6,8 @@ import type { AuthenticatedUser } from '../interfaces/authenticated-user.interfa
 import type { SupabaseAuthService } from '../services/supabase-auth.service';
 
 describe('SupabaseAuthGuard', () => {
-  const getAuthenticatedUserMock = jest.fn<
-    (accessToken: string) => Promise<AuthenticatedUser>
-  >();
+  const getAuthenticatedUserMock =
+    jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>();
 
   const mockSupabaseAuthService: Pick<
     SupabaseAuthService,
@@ -21,7 +20,9 @@ describe('SupabaseAuthGuard', () => {
     ...mockSupabaseAuthService,
   } as SupabaseAuthService);
 
-  const createExecutionContext = (request: AuthenticatedRequest): ExecutionContext => {
+  const createExecutionContext = (
+    request: AuthenticatedRequest,
+  ): ExecutionContext => {
     return {
       switchToHttp: () => ({
         getRequest: () => request,
@@ -57,7 +58,7 @@ describe('SupabaseAuthGuard', () => {
     getAuthenticatedUserMock.mockResolvedValue(user);
 
     const canActivate = await guard.canActivate(
-      createExecutionContext(request)
+      createExecutionContext(request),
     );
 
     expect(canActivate).toBe(true);
@@ -70,7 +71,7 @@ describe('SupabaseAuthGuard', () => {
     const request = createRequest(undefined);
 
     await expect(
-      guard.canActivate(createExecutionContext(request))
+      guard.canActivate(createExecutionContext(request)),
     ).rejects.toThrow(UnauthorizedException);
   });
 
@@ -78,7 +79,7 @@ describe('SupabaseAuthGuard', () => {
     const request = createRequest('Token invalid-format');
 
     await expect(
-      guard.canActivate(createExecutionContext(request))
+      guard.canActivate(createExecutionContext(request)),
     ).rejects.toThrow(UnauthorizedException);
   });
 });
