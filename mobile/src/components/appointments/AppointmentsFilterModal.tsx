@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import MaskInput from 'react-native-mask-input';
 import { BIRTH_DATE_MASK } from '@/lib/masks';
@@ -33,7 +40,8 @@ export function AppointmentsFilterModal({
   onClose,
 }: AppointmentsFilterModalProps) {
   const [localDate, setLocalDate] = useState(filters.date);
-  const [localProfessional, setLocalProfessional] = useState<Professional | null>(null);
+  const [localProfessional, setLocalProfessional] =
+    useState<Professional | null>(null);
   const [localSpecialty, setLocalSpecialty] = useState<Specialty | null>(null);
 
   const [professionals, setProfessionals] = useState<Professional[]>([]);
@@ -53,10 +61,14 @@ export function AppointmentsFilterModal({
       setSpecialties(specs);
 
       if (filters.professionalId) {
-        setLocalProfessional(profs.find((p) => p.id === filters.professionalId) ?? null);
+        setLocalProfessional(
+          profs.find((p) => p.id === filters.professionalId) ?? null,
+        );
       }
       if (filters.specialtyId) {
-        setLocalSpecialty(specs.find((s) => s.id === filters.specialtyId) ?? null);
+        setLocalSpecialty(
+          specs.find((s) => s.id === filters.specialtyId) ?? null,
+        );
       }
     } catch {
     } finally {
@@ -87,17 +99,28 @@ export function AppointmentsFilterModal({
   }
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
       <View style={styles.modalOverlay}>
         <View style={styles.modalSheet}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Filtros</Text>
-            <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <TouchableOpacity
+              onPress={onClose}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
               <Ionicons name="close" size={22} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.content}
+          >
             {/* Date Filter */}
             <View style={styles.fieldWrapper}>
               <Text style={styles.label}>Data da consulta</Text>
@@ -112,8 +135,15 @@ export function AppointmentsFilterModal({
                   keyboardType="numeric"
                 />
                 {localDate ? (
-                  <TouchableOpacity onPress={() => setLocalDate('')} style={styles.clearIcon}>
-                    <Ionicons name="close-circle" size={18} color={colors.textMuted} />
+                  <TouchableOpacity
+                    onPress={() => setLocalDate('')}
+                    style={styles.clearIcon}
+                  >
+                    <Ionicons
+                      name="close-circle"
+                      size={18}
+                      color={colors.textMuted}
+                    />
                   </TouchableOpacity>
                 ) : null}
               </View>
@@ -166,7 +196,10 @@ export function AppointmentsFilterModal({
               onSelect={(s) => {
                 setLocalSpecialty(s);
                 // Clear professional if the specialty changes and no longer matches
-                if (localProfessional && localProfessional.specialtyId !== s.id) {
+                if (
+                  localProfessional &&
+                  localProfessional.specialtyId !== s.id
+                ) {
                   setLocalProfessional(null);
                 }
                 setSpecModalVisible(false);
@@ -175,7 +208,10 @@ export function AppointmentsFilterModal({
             />
 
             <View style={styles.actionsRow}>
-              <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
+              <TouchableOpacity
+                style={styles.clearButton}
+                onPress={handleClear}
+              >
                 <Text style={styles.clearButtonText}>Limpar</Text>
               </TouchableOpacity>
               <View style={styles.applyButtonWrapper}>

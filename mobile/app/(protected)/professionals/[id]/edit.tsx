@@ -3,9 +3,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  View,
   ActivityIndicator,
   ScrollView,
+  View,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useForm } from 'react-hook-form';
@@ -14,9 +14,9 @@ import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProfessionalFormFields } from '@/components/professionals/ProfessionalFormFields';
-import { ProfessionalsHeader } from '@/components/professionals/ProfessionalsHeader';
 import { ProfessionalsLoadErrorState } from '@/components/professionals/ProfessionalsLoadErrorState';
 import { AppButton } from '@/components/ui/AppButton';
+import { BottomSheetScaffold } from '@/components/ui/BottomSheetScaffold';
 import {
   professionalFormSchema,
   type ProfessionalFormData,
@@ -115,14 +115,11 @@ export default function EditProfessionalScreen() {
       style={styles.keyboardView}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
-          <ProfessionalsHeader
-            title="Editar profissional"
-            subtitle="Altere os dados do profissional."
-            onBackPress={() => router.back()}
-          />
-
+      <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+        <BottomSheetScaffold
+          title="Editar profissional"
+          onClose={() => router.back()}
+        >
           {isLoading ? (
             <View style={styles.centerContainer}>
               <ActivityIndicator size="large" color={colors.primary} />
@@ -134,7 +131,6 @@ export default function EditProfessionalScreen() {
             />
           ) : (
             <ScrollView
-              style={styles.scrollContainer}
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
@@ -155,7 +151,7 @@ export default function EditProfessionalScreen() {
               </View>
             </ScrollView>
           )}
-        </View>
+        </BottomSheetScaffold>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
@@ -164,20 +160,14 @@ export default function EditProfessionalScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   keyboardView: {
     flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
+    backgroundColor: 'transparent',
   },
   centerContainer: {
-    flex: 1,
+    minHeight: 220,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -190,11 +180,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     gap: 14,
   },
-  scrollContainer: {
-    flex: 1,
-  },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 8,
   },
   buttonContainer: {
     marginTop: 8,
