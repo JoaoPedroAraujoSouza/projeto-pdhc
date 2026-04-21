@@ -2,11 +2,14 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,6 +23,7 @@ import { SpecialtiesLoadErrorState } from '@/components/specialties/SpecialtiesL
 import { SpecialtiesLoadingState } from '@/components/specialties/SpecialtiesLoadingState';
 import { SpecialtyFormCard } from '@/components/specialties/SpecialtyFormCard';
 import { SpecialtyListItem } from '@/components/specialties/SpecialtyListItem';
+import { FAB } from '@/components/ui/FAB';
 import {
   createSpecialtySchema,
   type CreateSpecialtySchemaData,
@@ -34,6 +38,7 @@ export default function SpecialtiesScreen() {
   const [isLoadingList, setIsLoadingList] = useState(true);
   const [isRefreshingList, setIsRefreshingList] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
 
   const {
@@ -109,6 +114,7 @@ export default function SpecialtiesScreen() {
         text2: 'A especialidade foi salva com sucesso.',
       });
 
+      setIsModalVisible(false);
       await loadSpecialties(true);
     } catch (error) {
       Toast.show({
@@ -130,12 +136,34 @@ export default function SpecialtiesScreen() {
         <View style={styles.container}>
           <SpecialtiesHeader onBackPress={() => router.back()} />
 
-          <SpecialtyFormCard
-            control={control}
-            errors={errors}
-            isSubmitting={isSubmitting}
-            onSubmit={handleSubmit(handleCreateSpecialty)}
-          />
+          <Modal
+            visible={isModalVisible}
+            animationType="slide"
+            transparent
+            onRequestClose={() => setIsModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalSheet}>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>Nova Especialidade</Text>
+                  <TouchableOpacity
+                    onPress={() => setIsModalVisible(false)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Ionicons name="close" size={22} color={colors.textMuted} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.modalBody}>
+                  <SpecialtyFormCard
+                    control={control}
+                    errors={errors}
+                    isSubmitting={isSubmitting}
+                    onSubmit={handleSubmit(handleCreateSpecialty)}
+                  />
+                </View>
+              </View>
+            </View>
+          </Modal>
 
           <View style={styles.listSection}>
             <View style={styles.listHeader}>
@@ -189,6 +217,8 @@ export default function SpecialtiesScreen() {
               />
             ) : null}
           </View>
+
+          <FAB onPress={() => setIsModalVisible(true)} />
         </View>
       </SafeAreaView>
     </KeyboardAvoidingView>
@@ -241,5 +271,34 @@ const styles = StyleSheet.create({
   listContent: {
     gap: 10,
     paddingBottom: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 24,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  modalBody: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
   },
 });

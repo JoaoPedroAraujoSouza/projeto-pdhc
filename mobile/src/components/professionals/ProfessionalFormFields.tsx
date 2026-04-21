@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Controller, type Control, type FieldErrors } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
+import { router, useFocusEffect } from 'expo-router';
 import { FormInput } from '@/components/ui/FormInput';
 import { listSpecialties } from '@/services/specialties/list-specialties';
 import type { ProfessionalFormData } from '@/schemas/professionals/professional-form-schema';
@@ -31,20 +32,22 @@ export function ProfessionalFormFields({
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [isLoadingSpecialties, setIsLoadingSpecialties] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      setIsLoadingSpecialties(true);
-      try {
-        const data = await listSpecialties();
-        setSpecialties(data);
-      } catch {
-      } finally {
-        setIsLoadingSpecialties(false);
-      }
+  const load = useCallback(async () => {
+    setIsLoadingSpecialties(true);
+    try {
+      const data = await listSpecialties();
+      setSpecialties(data);
+    } catch {
+    } finally {
+      setIsLoadingSpecialties(false);
     }
-
-    void load();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      void load();
+    }, [load]),
+  );
 
   return (
     <View style={styles.fields}>
@@ -152,12 +155,38 @@ export function ProfessionalFormFields({
                         </TouchableOpacity>
                       )}
                       ListEmptyComponent={
-                        <Text style={styles.modalEmpty}>
-                          Nenhuma especialidade disponível.
-                        </Text>
+                        <View style={styles.modalEmptyContainer}>
+                          <Text style={styles.modalEmpty}>
+                            Nenhuma especialidade disponível.
+                          </Text>
+                          <Text style={styles.modalEmptySubtitle}>
+                            Você precisa cadastrar uma especialidade antes de
+                            continuar.
+                          </Text>
+                        </View>
                       }
                     />
                   )}
+
+                  <View style={styles.modalFooter}>
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      style={styles.modalFooterButton}
+                      onPress={() => {
+                        setIsModalVisible(false);
+                        router.push('/(protected)/specialties');
+                      }}
+                    >
+                      <Ionicons
+                        name="add-circle-outline"
+                        size={20}
+                        color={colors.primary}
+                      />
+                      <Text style={styles.modalFooterButtonText}>
+                        Cadastrar Especialidade
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </Modal>
@@ -261,10 +290,45 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
+  modalEmptyContainer: {
+    paddingVertical: 32,
+    alignItems: 'center',
+    gap: 8,
+  },
   modalEmpty: {
+    textAlign: 'center',
+    color: colors.text,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalEmptySubtitle: {
     textAlign: 'center',
     color: colors.textMuted,
     fontSize: 14,
-    paddingVertical: 24,
+    lineHeight: 20,
+    paddingHorizontal: 20,
+  },
+  modalFooter: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    marginTop: 8,
+  },
+  modalFooterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.inputBackground,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  modalFooterButtonText: {
+    color: colors.primary,
+    fontSize: 15,
+    fontWeight: '700',
   },
 });
