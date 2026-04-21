@@ -8,7 +8,13 @@ export class RescheduleAppointmentDto {
     example: '2026-05-12T10:00:00.000Z',
   })
   @Type(() => String)
-  @IsDateString()
-  @IsNotEmpty()
+  @IsDateString(
+    { strict: true },
+    {
+      message:
+        'A data e horário de início devem ser um formato ISO 8601 válido.',
+    },
+  )
+  @IsNotEmpty({ message: 'A data e horário de início são obrigatórios.' })
   startAt!: string;
 }

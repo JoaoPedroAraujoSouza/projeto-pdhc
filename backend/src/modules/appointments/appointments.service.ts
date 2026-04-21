@@ -11,7 +11,6 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { ListAppointmentsQueryDto } from './dto/list-appointments-query.dto';
 import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto';
 
-/** Duration of each appointment slot in minutes. */
 const SLOT_DURATION_MINUTES = 30;
 
 const appointmentInclude = {
@@ -42,12 +41,12 @@ export class AppointmentsService {
     });
 
     if (!professional) {
-      throw new NotFoundException('Professional not found.');
+      throw new NotFoundException('Profissional não encontrado.');
     }
 
     if (professional.specialtyId !== dto.specialtyId) {
       throw new BadRequestException(
-        'The specialty does not match the professional specialty.',
+        'A especialidade não corresponde à especialidade do profissional.',
       );
     }
 
@@ -56,10 +55,10 @@ export class AppointmentsService {
     });
 
     if (!patient) {
-      throw new NotFoundException('Patient not found.');
+      throw new NotFoundException('Paciente não encontrado.');
     }
 
-    await this.assertNoConflict(dto.professionalId, startAt);
+    await this.assertNoConflict(dto.professionalId, dto.patientId, startAt);
 
     return this.prisma.appointment.create({
       data: {
@@ -112,7 +111,7 @@ export class AppointmentsService {
     });
 
     if (!appointment) {
-      throw new NotFoundException('Appointment not found.');
+      throw new NotFoundException('Agendamento não encontrado.');
     }
 
     return appointment;
@@ -125,7 +124,7 @@ export class AppointmentsService {
 
     if (appointment.status !== AppointmentStatus.SCHEDULED) {
       throw new UnprocessableEntityException(
-        'Only scheduled appointments can be confirmed.',
+        "Apenas agendamentos com status 'agendado' podem ser confirmados.",
       );
     }
 
@@ -146,7 +145,7 @@ export class AppointmentsService {
       appointment.status === AppointmentStatus.COMPLETED
     ) {
       throw new UnprocessableEntityException(
-        'Cancelled or completed appointments cannot be rescheduled.',
+        'Agendamentos cancelados ou concluídos não podem ser remarcados.',
       );
     }
 
@@ -154,7 +153,12 @@ export class AppointmentsService {
 
     this.assertNotInThePast(newStartAt);
 
-    await this.assertNoConflict(appointment.professionalId, newStartAt, id);
+    await this.assertNoConflict(
+      appointment.professionalId,
+      appointment.patientId,
+      newStartAt,
+      id,
+    );
 
     return this.prisma.appointment.update({
       where: { id },
@@ -173,7 +177,7 @@ export class AppointmentsService {
       appointment.status === AppointmentStatus.COMPLETED
     ) {
       throw new UnprocessableEntityException(
-        'Appointment is already cancelled or completed.',
+        'O agendamento já está cancelado ou concluído.',
       );
     }
 
@@ -194,7 +198,7 @@ export class AppointmentsService {
       appointment.status !== AppointmentStatus.CONFIRMED
     ) {
       throw new UnprocessableEntityException(
-        'Only active appointments (scheduled or confirmed) can be completed.',
+        'Apenas agendamentos ativos (agendado ou confirmado) podem ser concluídos.',
       );
     }
 
@@ -210,41 +214,65 @@ export class AppointmentsService {
   private assertNotInThePast(startAt: Date): void {
     if (startAt <= new Date()) {
       throw new BadRequestException(
-        'Appointment cannot be scheduled in the past.',
+        'O agendamento não pode ser criado no passado.',
       );
     }
   }
 
   private async assertNoConflict(
     professionalId: string,
+    patientId: string,
     startAt: Date,
     excludeId?: string,
   ): Promise<void> {
     const slotEnd = new Date(
       startAt.getTime() + SLOT_DURATION_MINUTES * 60_000,
     );
+    const lowerBound = new Date(
+      startAt.getTime() - SLOT_DURATION_MINUTES * 60_000,
+    );
 
-    const conflict = await this.prisma.appointment.findFirst({
+    const activeStatuses = {
+      in: [AppointmentStatus.SCHEDULED, AppointmentStatus.CONFIRMED],
+    };
+    const timeOverlap = [
+      // existing slot starts before new slot ends
+      { startAt: { lt: slotEnd } },
+      // existing slot ends after new slot starts → existing.startAt + 30min > startAt
+      // ⟺ existing.startAt > startAt - 30min  (strict: adjacent slots are NOT a conflict)
+      { startAt: { gt: lowerBound } },
+    ];
+    const excludeFilter = excludeId ? { not: excludeId } : undefined;
+
+    // Check professional conflict
+    const professionalConflict = await this.prisma.appointment.findFirst({
       where: {
         professionalId,
-        id: excludeId ? { not: excludeId } : undefined,
-        status: {
-          in: [AppointmentStatus.SCHEDULED, AppointmentStatus.CONFIRMED],
-        },
-        AND: [
-          { startAt: { lt: slotEnd } },
-          {
-            startAt: {
-              gte: new Date(startAt.getTime() - SLOT_DURATION_MINUTES * 60_000),
-            },
-          },
-        ],
+        id: excludeFilter,
+        status: activeStatuses,
+        AND: timeOverlap,
       },
     });
 
-    if (conflict) {
+    if (professionalConflict) {
       throw new ConflictException(
-        'The professional already has an appointment in this time slot.',
+        'O profissional já possui um agendamento nesse horário.',
+      );
+    }
+
+    // Check patient conflict
+    const patientConflict = await this.prisma.appointment.findFirst({
+      where: {
+        patientId,
+        id: excludeFilter,
+        status: activeStatuses,
+        AND: timeOverlap,
+      },
+    });
+
+    if (patientConflict) {
+      throw new ConflictException(
+        'O paciente já possui um agendamento nesse horário.',
       );
     }
   }

@@ -7,7 +7,6 @@ import {
   IsString,
   IsUUID,
   MaxLength,
-  MinLength,
 } from 'class-validator';
 
 export class CreateAppointmentDto {
@@ -15,16 +14,16 @@ export class CreateAppointmentDto {
     description: 'UUID of the patient',
     example: 'a1b2c3d4-aafd-46eb-aec1-6044f2d9a66a',
   })
-  @IsUUID()
-  @IsNotEmpty()
+  @IsUUID('all', { message: 'O ID do paciente deve ser um UUID válido.' })
+  @IsNotEmpty({ message: 'O ID do paciente é obrigatório.' })
   patientId!: string;
 
   @ApiProperty({
     description: 'UUID of the professional',
     example: 'c3d4e5f6-aafd-46eb-aec1-6044f2d9a66a',
   })
-  @IsUUID()
-  @IsNotEmpty()
+  @IsUUID('all', { message: 'O ID do profissional deve ser um UUID válido.' })
+  @IsNotEmpty({ message: 'O ID do profissional é obrigatório.' })
   professionalId!: string;
 
   @ApiProperty({
@@ -32,8 +31,8 @@ export class CreateAppointmentDto {
       'UUID of the specialty — must match the professional specialty',
     example: '8b1c9934-aafd-46eb-aec1-6044f2d9a66a',
   })
-  @IsUUID()
-  @IsNotEmpty()
+  @IsUUID('all', { message: 'O ID da especialidade deve ser um UUID válido.' })
+  @IsNotEmpty({ message: 'O ID da especialidade é obrigatório.' })
   specialtyId!: string;
 
   @ApiProperty({
@@ -41,8 +40,14 @@ export class CreateAppointmentDto {
     example: '2026-05-10T14:00:00.000Z',
   })
   @Type(() => String)
-  @IsDateString()
-  @IsNotEmpty()
+  @IsDateString(
+    { strict: true },
+    {
+      message:
+        'A data e horário de início devem ser um formato ISO 8601 válido.',
+    },
+  )
+  @IsNotEmpty({ message: 'A data e horário de início são obrigatórios.' })
   startAt!: string;
 
   @ApiPropertyOptional({
@@ -51,8 +56,9 @@ export class CreateAppointmentDto {
     maxLength: 500,
   })
   @IsOptional()
-  @IsString()
-  @MinLength(1)
-  @MaxLength(500)
+  @IsString({ message: 'As observações devem ser um texto.' })
+  @MaxLength(500, {
+    message: 'As observações não podem ter mais que 500 caracteres.',
+  })
   notes?: string;
 }
