@@ -25,5 +25,5 @@ export default function IndexScreen() {
     return <Redirect href="/auth/sign-in" />;
   }
 
-  return <Redirect href="/(protected)/dashboard" />;
+  return <Redirect href="./(protected)/dashboard" />;
 }
