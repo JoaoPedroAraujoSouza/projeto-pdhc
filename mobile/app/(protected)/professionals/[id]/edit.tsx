@@ -5,6 +5,7 @@ import {
   StyleSheet,
   View,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useForm } from 'react-hook-form';
@@ -132,21 +133,27 @@ export default function EditProfessionalScreen() {
               onRetry={loadData}
             />
           ) : (
-            <View style={styles.formContainer}>
-              <ProfessionalFormFields
-                control={control}
-                errors={errors}
-                selectedSpecialtyName={selectedSpecialtyName}
-              />
-
-              <View style={styles.buttonContainer}>
-                <AppButton
-                  title="Salvar alterações"
-                  isLoading={isSubmitting}
-                  onPress={handleSubmit(onSubmit)}
+            <ScrollView
+              style={styles.scrollContainer}
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.formContainer}>
+                <ProfessionalFormFields
+                  control={control}
+                  errors={errors}
+                  selectedSpecialtyName={selectedSpecialtyName}
                 />
+                <View style={styles.buttonContainer}>
+                  <AppButton
+                    title="Salvar alterações"
+                    isLoading={isSubmitting}
+                    onPress={handleSubmit(onSubmit)}
+                  />
+                </View>
               </View>
-            </View>
+            </ScrollView>
           )}
         </View>
       </SafeAreaView>
@@ -182,6 +189,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 14,
     gap: 14,
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 20,
   },
   buttonContainer: {
     marginTop: 8,

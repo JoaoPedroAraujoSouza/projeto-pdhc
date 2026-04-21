@@ -9,7 +9,7 @@ export function ProfessionalsEmptyState() {
       <Ionicons name="people-outline" size={32} color={colors.textMuted} />
       <Text style={styles.title}>Nenhum profissional cadastrado</Text>
       <Text style={styles.subtitle}>
-        Toque em "Novo profissional" para começar o cadastro.
+        Toque no botão + abaixo para começar o cadastro.
       </Text>
     </View>
   );

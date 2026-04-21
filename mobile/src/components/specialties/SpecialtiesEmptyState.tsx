@@ -9,7 +9,7 @@ export function SpecialtiesEmptyState() {
       <Ionicons name="medkit-outline" size={32} color={colors.textMuted} />
       <Text style={styles.title}>Nenhuma especialidade cadastrada</Text>
       <Text style={styles.subtitle}>
-        Cadastre a primeira especialidade para comecar o fluxo.
+        Toque no botão + abaixo para cadastrar a primeira especialidade.
       </Text>
     </View>
   );

@@ -3,23 +3,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '@/styles/colors';
 
-type RightAction = {
-  label: string;
-  onPress: () => void;
-};
-
 type ProfessionalsHeaderProps = {
   title: string;
   subtitle: string;
   onBackPress: () => void;
-  rightAction?: RightAction;
 };
 
 export function ProfessionalsHeader({
   title,
   subtitle,
   onBackPress,
-  rightAction,
 }: ProfessionalsHeaderProps) {
   return (
     <View style={styles.header}>
@@ -35,17 +28,6 @@ export function ProfessionalsHeader({
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
-
-      {rightAction ? (
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={rightAction.onPress}
-          style={styles.rightButton}
-        >
-          <Ionicons name="add" size={20} color={colors.primary} />
-          <Text style={styles.rightButtonText}>{rightAction.label}</Text>
-        </TouchableOpacity>
-      ) : null}
     </View>
   );
 }
@@ -79,21 +61,5 @@ const styles = StyleSheet.create({
   subtitle: {
     color: colors.textMuted,
     fontSize: 14,
-  },
-  rightButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-  },
-  rightButtonText: {
-    color: colors.primary,
-    fontSize: 13,
-    fontWeight: '700',
   },
 });
