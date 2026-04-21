@@ -9,7 +9,7 @@ export async function getDashboardToday(): Promise<DashboardTodayResponse> {
   const dateString = `${year}-${month}-${day}`;
 
   const response = await api.get<DashboardTodayResponse>(
-    `/api/dashboard/today?date=${dateString}`,
+    `/dashboard/today?date=${dateString}`,
   );
   return response.data;
 }

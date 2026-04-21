@@ -8,26 +8,30 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message';
 import { useAuth } from '@/hooks/useAuth';
 import { colors } from '@/styles/colors';
 import { getDashboardToday } from '@/services/dashboard/get-dashboard-today';
-import { DashboardTodayResponse } from '@/types/dashboard';
+import type { DashboardTodayResponse } from '@/types/dashboard';
 import { AppointmentListItem } from '@/components/appointments/AppointmentListItem';
 import { AppointmentsEmptyState } from '@/components/appointments/AppointmentsEmptyState';
 
 export default function DashboardScreen() {
   const { user, signOut } = useAuth();
+
   const [data, setData] = useState<DashboardTodayResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   const loadDashboard = useCallback(async () => {
     try {
+      setLoading(true);
       setError(false);
-      const res = await getDashboardToday();
-      setData(res);
+      const response = await getDashboardToday();
+      setData(response);
     } catch {
       setError(true);
     } finally {
@@ -45,48 +49,70 @@ export default function DashboardScreen() {
     try {
       await signOut();
     } catch {
-      // ignore
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao sair',
+        text2: 'Não foi possível sair da conta agora.',
+      });
     }
   }
 
+  const displayName =
+    user?.user_metadata?.name ?? user?.email?.split('@')[0] ?? 'Usuário';
+
   if (loading && !data) {
     return (
-      <View style={styles.centerContainer}>
+      <SafeAreaView style={styles.centerContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
-      </View>
+      </SafeAreaView>
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
-      <View style={styles.centerContainer}>
+      <SafeAreaView style={styles.centerContainer}>
         <Ionicons name="alert-circle-outline" size={48} color={colors.danger} />
         <Text style={styles.errorTitle}>Ops!</Text>
         <Text style={styles.errorText}>
           Não foi possível carregar o dashboard de hoje.
         </Text>
         <TouchableOpacity style={styles.retryButton} onPress={loadDashboard}>
-          <Text style={styles.retryButtonText}>Tentar Novamente</Text>
+          <Text style={styles.retryButtonText}>Tentar novamente</Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={loadDashboard} />
         }
       >
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>Olá,</Text>
-            <Text style={styles.email}>{user?.email ?? 'Usuário'}</Text>
+          <View style={styles.userInfo}>
+            <Ionicons
+              name="person-circle-outline"
+              size={44}
+              color={colors.primary}
+            />
+            <View style={styles.userTextContainer}>
+              <Text style={styles.greeting}>Bem-vindo,</Text>
+              <Text style={styles.userName} numberOfLines={1}>
+                {displayName}
+              </Text>
+            </View>
           </View>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-            <Ionicons name="log-out-outline" size={24} color={colors.text} />
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={handleSignOut}
+            activeOpacity={0.8}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="log-out-outline" size={24} color={colors.danger} />
           </TouchableOpacity>
         </View>
 
@@ -94,7 +120,9 @@ export default function DashboardScreen() {
 
         <View style={styles.metricsContainer}>
           <View style={[styles.metricCard, styles.metricCardPrimary]}>
-            <Text style={styles.metricPrimaryValue}>{data?.metrics.total}</Text>
+            <Text style={styles.metricPrimaryValue}>
+              {data?.metrics.total ?? 0}
+            </Text>
             <Text style={styles.metricPrimaryLabel}>Total de Consultas</Text>
           </View>
 
@@ -103,7 +131,7 @@ export default function DashboardScreen() {
               <Text
                 style={[styles.smallMetricValue, { color: colors.warning }]}
               >
-                {data?.metrics.SCHEDULED}
+                {data?.metrics.SCHEDULED ?? 0}
               </Text>
               <Text style={styles.smallMetricLabel}>Agendadas</Text>
             </View>
@@ -111,7 +139,7 @@ export default function DashboardScreen() {
               <Text
                 style={[styles.smallMetricValue, { color: colors.primary }]}
               >
-                {data?.metrics.CONFIRMED}
+                {data?.metrics.CONFIRMED ?? 0}
               </Text>
               <Text style={styles.smallMetricLabel}>Confirmadas</Text>
             </View>
@@ -119,13 +147,13 @@ export default function DashboardScreen() {
               <Text
                 style={[styles.smallMetricValue, { color: colors.success }]}
               >
-                {data?.metrics.COMPLETED}
+                {data?.metrics.COMPLETED ?? 0}
               </Text>
               <Text style={styles.smallMetricLabel}>Concluídas</Text>
             </View>
             <View style={styles.smallMetricCard}>
               <Text style={[styles.smallMetricValue, { color: colors.danger }]}>
-                {data?.metrics.CANCELLED}
+                {data?.metrics.CANCELLED ?? 0}
               </Text>
               <Text style={styles.smallMetricLabel}>Canceladas</Text>
             </View>
@@ -139,11 +167,11 @@ export default function DashboardScreen() {
         <View style={styles.agendaContainer}>
           {data?.upcomingAppointments &&
           data.upcomingAppointments.length > 0 ? (
-            data.upcomingAppointments.map((app) => (
+            data.upcomingAppointments.map((appointment) => (
               <AppointmentListItem
-                key={app.id}
-                appointment={app as any}
-                onPress={() => router.push(`/appointments/${app.id}`)}
+                key={appointment.id}
+                appointment={appointment}
+                onPress={() => router.push(`/appointments/${appointment.id}`)}
               />
             ))
           ) : (
@@ -151,7 +179,6 @@ export default function DashboardScreen() {
           )}
         </View>
 
-        {/* Menu Secundário */}
         <View style={styles.quickMenu}>
           <Text style={styles.quickMenuTitle}>Menu Rápido</Text>
           <View style={styles.quickMenuGrid}>
@@ -203,15 +230,14 @@ export default function DashboardScreen() {
         </View>
       </ScrollView>
 
-      {/* FAB para Novo Agendamento */}
       <TouchableOpacity
         style={styles.fab}
-        activeOpacity={0.8}
+        activeOpacity={0.85}
         onPress={() => router.push('/appointments')}
       >
         <Ionicons name="add" size={28} color={colors.surface} />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -228,31 +254,43 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   scrollContent: {
-    padding: 24,
-    paddingBottom: 100,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 120,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: 32,
+    backgroundColor: colors.surface,
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  userTextContainer: {
+    flex: 1,
   },
   greeting: {
-    fontSize: 16,
+    fontSize: 13,
     color: colors.textMuted,
+    fontWeight: '500',
   },
-  email: {
-    fontSize: 22,
+  userName: {
+    fontSize: 18,
     fontWeight: '700',
     color: colors.text,
-    marginTop: 2,
   },
   logoutButton: {
     padding: 8,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
+    marginLeft: 8,
   },
   sectionTitle: {
     fontSize: 18,
@@ -264,17 +302,17 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 32,
   },
+  metricCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: 16,
+  },
   metricCardPrimary: {
     backgroundColor: colors.primary,
     padding: 20,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  metricCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
   },
   metricPrimaryValue: {
     fontSize: 48,
@@ -283,7 +321,7 @@ const styles = StyleSheet.create({
   },
   metricPrimaryLabel: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.85)',
     fontWeight: '500',
     marginTop: 4,
   },
@@ -316,6 +354,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 8,
   },
   agendaContainer: {
     gap: 12,
@@ -344,22 +383,6 @@ const styles = StyleSheet.create({
     color: colors.surface,
     fontWeight: '700',
     fontSize: 15,
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 8,
   },
   quickMenu: {
     marginTop: 16,
@@ -393,5 +416,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.text,
     fontWeight: '500',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
   },
 });

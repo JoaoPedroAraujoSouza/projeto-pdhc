@@ -16,7 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { PatientFormFields } from '@/components/patients/PatientFormFields';
 import { PatientsLoadErrorState } from '@/components/patients/PatientsLoadErrorState';
 import { AppButton } from '@/components/ui/AppButton';
-import { ProfessionalsHeader } from '@/components/professionals/ProfessionalsHeader';
+import { BottomSheetScaffold } from '@/components/ui/BottomSheetScaffold';
 import {
   patientFormSchema,
   type PatientFormData,
@@ -105,14 +105,11 @@ export default function EditPatientScreen() {
       style={styles.keyboardView}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
-          <ProfessionalsHeader
-            title="Editar paciente"
-            subtitle="Altere os dados do paciente."
-            onBackPress={() => router.back()}
-          />
-
+      <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+        <BottomSheetScaffold
+          title="Editar paciente"
+          onClose={() => router.back()}
+        >
           {isLoading ? (
             <View style={styles.centerContainer}>
               <ActivityIndicator size="large" color={colors.primary} />
@@ -121,7 +118,6 @@ export default function EditPatientScreen() {
             <PatientsLoadErrorState message={loadError} onRetry={loadData} />
           ) : (
             <ScrollView
-              style={styles.scrollContainer}
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
@@ -138,7 +134,7 @@ export default function EditPatientScreen() {
               </View>
             </ScrollView>
           )}
-        </View>
+        </BottomSheetScaffold>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
@@ -147,28 +143,19 @@ export default function EditPatientScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   keyboardView: {
     flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
+    backgroundColor: 'transparent',
   },
   centerContainer: {
-    flex: 1,
+    minHeight: 220,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  scrollContainer: {
-    flex: 1,
-  },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 8,
   },
   formContainer: {
     backgroundColor: colors.surface,

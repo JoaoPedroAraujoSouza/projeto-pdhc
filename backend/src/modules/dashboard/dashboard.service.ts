@@ -1,6 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../lib/prisma/prisma.service';
-import { AppointmentStatus } from '@prisma/client';
 
 @Injectable()
 export class DashboardService {

@@ -9,4 +9,5 @@ export const colors = {
   inputBackground: '#F9FBFD',
   danger: '#C0392B',
   success: '#1E8449',
+  warning: '#D97706',
 };
