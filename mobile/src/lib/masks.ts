@@ -51,3 +51,5 @@ export const BIRTH_DATE_MASK = [
   /\d/,
   /\d/,
 ];
+
+export const TIME_MASK = [/\d/, /\d/, ':', /\d/, /\d/];

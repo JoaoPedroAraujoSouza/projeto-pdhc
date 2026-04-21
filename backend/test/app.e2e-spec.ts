@@ -11,13 +11,13 @@ import { UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 import { SupabaseAuthService } from '../src/modules/auth/services/supabase-auth.service';
 import type { AuthenticatedUser } from '../src/modules/auth/interfaces/authenticated-user.interface';
+import { setupE2eApp } from './utils/e2e-setup';
 
 describe('App (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: INestApplication;
   const getAuthenticatedUserMock =
     jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>();
 
@@ -31,9 +31,7 @@ describe('App (e2e)', () => {
       })
       .compile();
 
-    app = moduleFixture.createNestApplication();
-    app.setGlobalPrefix('api');
-    await app.init();
+    app = await setupE2eApp(moduleFixture);
   });
 
   beforeEach(() => {

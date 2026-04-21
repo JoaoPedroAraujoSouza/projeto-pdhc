@@ -6,12 +6,20 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
 model Specialty {
   id            String         @id @default(uuid())
   name          String         @unique
   createdAt     DateTime       @default(now())
 
   professionals Professional[]
+  appointments  Appointment[]
 
   @@map("specialties")
 }
@@ -23,7 +31,8 @@ model Professional {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  specialty   Specialty @relation(fields: [specialtyId], references: [id])
+  specialty    Specialty     @relation(fields: [specialtyId], references: [id])
+  appointments Appointment[]
 
   @@map("professionals")
 }
@@ -37,5 +46,25 @@ model Patient {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  appointments Appointment[]
+
   @@map("patients")
+}
+
+model Appointment {
+  id             String            @id @default(uuid())
+  patientId      String
+  professionalId String
+  specialtyId    String
+  startAt        DateTime
+  status         AppointmentStatus @default(SCHEDULED)
+  notes          String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  patient      Patient      @relation(fields: [patientId], references: [id])
+  professional Professional @relation(fields: [professionalId], references: [id])
+  specialty    Specialty    @relation(fields: [specialtyId], references: [id])
+
+  @@map("appointments")
 }

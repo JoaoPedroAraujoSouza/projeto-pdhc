@@ -36,7 +36,7 @@ export class PatientsService {
     });
 
     if (!patient) {
-      throw new NotFoundException('Patient not found.');
+      throw new NotFoundException('Paciente não encontrado.');
     }
 
     return patient;
@@ -72,7 +72,7 @@ export class PatientsService {
 
     if (existing && existing.id !== excludeId) {
       throw new ConflictException(
-        'A patient with this CPF is already registered.',
+        'Já existe um paciente cadastrado com este CPF.',
       );
     }
   }
