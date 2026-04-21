@@ -48,6 +48,13 @@ export default function DashboardScreen() {
         <Text style={styles.secondaryButtonText}>Pacientes</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity
+        style={styles.secondaryButton}
+        onPress={() => router.push('./appointments')}
+      >
+        <Text style={styles.secondaryButtonText}>Agendamentos</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.button} onPress={handleSignOut}>
         <Text style={styles.buttonText}>Sair</Text>
       </TouchableOpacity>
