@@ -8,6 +8,8 @@ import { PrismaModule } from './lib/prisma/prisma.module';
 import { ProfessionalsModule } from './modules/professionals/professionals.module';
 import { SpecialtiesModule } from './modules/specialties/specialties.module';
 
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,6 +22,7 @@ import { SpecialtiesModule } from './modules/specialties/specialties.module';
     ProfessionalsModule,
     PatientsModule,
     AppointmentsModule,
+    DashboardModule,
   ],
   controllers: [HealthController],
 })

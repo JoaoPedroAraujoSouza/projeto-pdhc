@@ -24,7 +24,10 @@ import { AppointmentsLoadErrorState } from '@/components/appointments/Appointmen
 import { AppointmentsLoadingState } from '@/components/appointments/AppointmentsLoadingState';
 import { AppButton } from '@/components/ui/AppButton';
 import { FAB } from '@/components/ui/FAB';
-import { AppointmentsFilterModal, type AppointmentsFilterData } from '@/components/appointments/AppointmentsFilterModal';
+import {
+  AppointmentsFilterModal,
+  type AppointmentsFilterData,
+} from '@/components/appointments/AppointmentsFilterModal';
 import { ProfessionalsHeader } from '@/components/professionals/ProfessionalsHeader';
 import {
   appointmentFormSchema,
@@ -70,7 +73,9 @@ export default function AppointmentsScreen() {
   });
 
   const hasAdvancedFilters = Boolean(
-    activeFilters.date || activeFilters.professionalId || activeFilters.specialtyId
+    activeFilters.date ||
+    activeFilters.professionalId ||
+    activeFilters.specialtyId,
   );
 
   // Form display state
@@ -163,9 +168,10 @@ export default function AppointmentsScreen() {
       setListError(null);
 
       try {
-        const parsedDate = activeFilters.date.length === 10
-          ? activeFilters.date.split('/').reverse().join('-')
-          : undefined;
+        const parsedDate =
+          activeFilters.date.length === 10
+            ? activeFilters.date.split('/').reverse().join('-')
+            : undefined;
 
         const data = await listAppointments({
           status: activeStatus,
@@ -264,7 +270,11 @@ export default function AppointmentsScreen() {
               setFilterModalVisible(false);
             }}
             onClear={() => {
-              setActiveFilters({ date: '', professionalId: '', specialtyId: '' });
+              setActiveFilters({
+                date: '',
+                professionalId: '',
+                specialtyId: '',
+              });
               setFilterModalVisible(false);
             }}
             onClose={() => setFilterModalVisible(false)}
