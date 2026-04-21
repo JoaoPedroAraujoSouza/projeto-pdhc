@@ -1,5 +1,14 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import { useForm } from 'react-hook-form';
@@ -165,7 +174,9 @@ export default function ProfessionalsScreen() {
                       control={control}
                       errors={errors}
                       selectedSpecialtyName={
-                        watch('specialtyId') ? 'Especialidade selecionada' : undefined
+                        watch('specialtyId')
+                          ? 'Especialidade selecionada'
+                          : undefined
                       }
                     />
                     <View style={styles.buttonContainer}>
@@ -181,68 +192,68 @@ export default function ProfessionalsScreen() {
             </View>
           </Modal>
 
-        <View style={styles.listSection}>
-          <View style={styles.listHeader}>
-            <Text style={styles.listTitle}>Lista de profissionais</Text>
+          <View style={styles.listSection}>
+            <View style={styles.listHeader}>
+              <Text style={styles.listTitle}>Lista de profissionais</Text>
 
-            {hasProfessionals ? (
-              <Text style={styles.listCount}>
-                {professionals.length}{' '}
-                {professionals.length === 1 ? 'item' : 'itens'}
-              </Text>
+              {hasProfessionals ? (
+                <Text style={styles.listCount}>
+                  {professionals.length}{' '}
+                  {professionals.length === 1 ? 'item' : 'itens'}
+                </Text>
+              ) : null}
+            </View>
+
+            {shouldShowInlineError && listError ? (
+              <ProfessionalsInlineError
+                message={listError}
+                onRetry={() => {
+                  void loadProfessionals(true);
+                }}
+              />
+            ) : null}
+
+            {isLoadingList ? <ProfessionalsLoadingState /> : null}
+
+            {shouldShowErrorState && listError ? (
+              <ProfessionalsLoadErrorState
+                message={listError}
+                onRetry={() => {
+                  void loadProfessionals();
+                }}
+              />
+            ) : null}
+
+            {hasContentToRender && !hasProfessionals ? (
+              <ProfessionalsEmptyState />
+            ) : null}
+
+            {hasContentToRender && hasProfessionals ? (
+              <FlatList
+                data={professionals}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <ProfessionalListItem
+                    professional={item}
+                    onEditPress={() =>
+                      router.push(`./professionals/${item.id}/edit`)
+                    }
+                  />
+                )}
+                refreshing={isRefreshingList}
+                onRefresh={() => {
+                  void loadProfessionals(true);
+                }}
+                contentContainerStyle={styles.listContent}
+                showsVerticalScrollIndicator={false}
+              />
             ) : null}
           </View>
 
-          {shouldShowInlineError && listError ? (
-            <ProfessionalsInlineError
-              message={listError}
-              onRetry={() => {
-                void loadProfessionals(true);
-              }}
-            />
-          ) : null}
-
-          {isLoadingList ? <ProfessionalsLoadingState /> : null}
-
-          {shouldShowErrorState && listError ? (
-            <ProfessionalsLoadErrorState
-              message={listError}
-              onRetry={() => {
-                void loadProfessionals();
-              }}
-            />
-          ) : null}
-
-          {hasContentToRender && !hasProfessionals ? (
-            <ProfessionalsEmptyState />
-          ) : null}
-
-          {hasContentToRender && hasProfessionals ? (
-            <FlatList
-              data={professionals}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <ProfessionalListItem
-                  professional={item}
-                  onEditPress={() =>
-                    router.push(`./professionals/${item.id}/edit`)
-                  }
-                />
-              )}
-              refreshing={isRefreshingList}
-              onRefresh={() => {
-                void loadProfessionals(true);
-              }}
-              contentContainerStyle={styles.listContent}
-              showsVerticalScrollIndicator={false}
-            />
-          ) : null}
+          <FAB onPress={() => setIsModalVisible(true)} />
         </View>
-
-        <FAB onPress={() => setIsModalVisible(true)} />
-      </View>
-    </SafeAreaView>
-  </KeyboardAvoidingView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
