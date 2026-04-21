@@ -20,11 +20,11 @@ import { ProfessionalsHeader } from '@/components/professionals/ProfessionalsHea
 import {
   patientFormSchema,
   type PatientFormData,
+  type PatientFormRawValues,
 } from '@/schemas/patients/patient-form-schema';
 import { getPatient } from '@/services/patients/get-patient';
 import { updatePatient } from '@/services/patients/update-patient';
 import { colors } from '@/styles/colors';
-import type { Patient } from '@/types/patient';
 
 export default function EditPatientScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -32,14 +32,13 @@ export default function EditPatientScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [patient, setPatient] = useState<Patient | null>(null);
 
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<PatientFormData>({
+  } = useForm<PatientFormRawValues>({
     resolver: zodResolver(patientFormSchema),
     defaultValues: { fullName: '', cpf: '', birthDate: '', phone: '' },
   });
@@ -52,11 +51,11 @@ export default function EditPatientScreen() {
 
     try {
       const data = await getPatient(id);
-      setPatient(data);
       reset({
         fullName: data.fullName,
         cpf: data.cpf,
-        birthDate: data.birthDate.split('T')[0],
+        // Convert YYYY-MM-DD (API) → DD/MM/AAAA (display)
+        birthDate: data.birthDate.split('T')[0].split('-').reverse().join('/'),
         phone: data.phone,
       });
     } catch {
@@ -100,8 +99,6 @@ export default function EditPatientScreen() {
       setIsSubmitting(false);
     }
   }
-
-  void patient;
 
   return (
     <KeyboardAvoidingView

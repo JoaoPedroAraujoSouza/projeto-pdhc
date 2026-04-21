@@ -29,6 +29,7 @@ import { ProfessionalsHeader } from '@/components/professionals/ProfessionalsHea
 import {
   patientFormSchema,
   type PatientFormData,
+  type PatientFormRawValues,
 } from '@/schemas/patients/patient-form-schema';
 import { createPatient } from '@/services/patients/create-patient';
 import { listPatients } from '@/services/patients/list-patients';
@@ -48,7 +49,7 @@ export default function PatientsScreen() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<PatientFormData>({
+  } = useForm<PatientFormRawValues>({
     resolver: zodResolver(patientFormSchema),
     defaultValues: { fullName: '', cpf: '', birthDate: '', phone: '' },
   });
