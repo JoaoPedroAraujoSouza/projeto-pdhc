@@ -75,7 +75,9 @@ export default function SpecialtiesScreen() {
       const response = await listSpecialties();
       setSpecialties(response);
     } catch (error) {
-      setListError(getErrorMessage(error, 'Nao foi possivel carregar especialidades.'));
+      setListError(
+        getErrorMessage(error, 'Nao foi possivel carregar especialidades.'),
+      );
     } finally {
       if (refresh) {
         setIsRefreshingList(false);
@@ -167,13 +169,17 @@ export default function SpecialtiesScreen() {
               />
             ) : null}
 
-            {hasContentToRender && !hasSpecialties ? <SpecialtiesEmptyState /> : null}
+            {hasContentToRender && !hasSpecialties ? (
+              <SpecialtiesEmptyState />
+            ) : null}
 
             {hasContentToRender && hasSpecialties ? (
               <FlatList
                 data={specialties}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => <SpecialtyListItem specialty={item} />}
+                renderItem={({ item }) => (
+                  <SpecialtyListItem specialty={item} />
+                )}
                 refreshing={isRefreshingList}
                 onRefresh={() => {
                   void loadSpecialties(true);

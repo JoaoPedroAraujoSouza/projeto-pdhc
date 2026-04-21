@@ -20,7 +20,9 @@ export function SpecialtiesHeader({ onBackPress }: SpecialtiesHeaderProps) {
 
       <View style={styles.headerTextWrapper}>
         <Text style={styles.title}>Especialidades</Text>
-        <Text style={styles.subtitle}>Cadastre e visualize especialidades.</Text>
+        <Text style={styles.subtitle}>
+          Cadastre e visualize especialidades.
+        </Text>
       </View>
     </View>
   );

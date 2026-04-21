@@ -11,7 +11,9 @@ export function SpecialtyListItem({ specialty }: SpecialtyListItemProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.name}>{specialty.name}</Text>
-      <Text style={styles.meta}>Criada em {formatDate(specialty.createdAt)}</Text>
+      <Text style={styles.meta}>
+        Criada em {formatDate(specialty.createdAt)}
+      </Text>
     </View>
   );
 }
