@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -12,34 +11,21 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppointmentFormFields } from '@/components/appointments/AppointmentFormFields';
 import { AppointmentListItem } from '@/components/appointments/AppointmentListItem';
 import { AppointmentsEmptyState } from '@/components/appointments/AppointmentsEmptyState';
 import { AppointmentsLoadErrorState } from '@/components/appointments/AppointmentsLoadErrorState';
 import { AppointmentsLoadingState } from '@/components/appointments/AppointmentsLoadingState';
-import { AppButton } from '@/components/ui/AppButton';
 import { FAB } from '@/components/ui/FAB';
 import {
   AppointmentsFilterModal,
   type AppointmentsFilterData,
 } from '@/components/appointments/AppointmentsFilterModal';
 import { ProfessionalsHeader } from '@/components/professionals/ProfessionalsHeader';
-import {
-  appointmentFormSchema,
-  toISOStartAt,
-  type AppointmentFormData,
-} from '@/schemas/appointments/appointment-form-schema';
-import { createAppointment } from '@/services/appointments/create-appointment';
 import { listAppointments } from '@/services/appointments/list-appointments';
 import { colors } from '@/styles/colors';
 import type { Appointment, AppointmentStatus } from '@/types/appointment';
-import type { Patient } from '@/types/patient';
-import type { Professional } from '@/types/professional';
 
 const STATUS_OPTIONS: {
   label: string;
@@ -57,9 +43,6 @@ export default function AppointmentsScreen() {
   const [isLoadingList, setIsLoadingList] = useState(true);
   const [isRefreshingList, setIsRefreshingList] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [createError, setCreateError] = useState<string | null>(null);
 
   // Filters
   const [activeStatus, setActiveStatus] = useState<
@@ -77,77 +60,6 @@ export default function AppointmentsScreen() {
     activeFilters.professionalId ||
     activeFilters.specialtyId,
   );
-
-  // Form display state
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [selectedProfessional, setSelectedProfessional] =
-    useState<Professional | null>(null);
-
-  const {
-    control,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm<AppointmentFormData>({
-    resolver: zodResolver(appointmentFormSchema),
-    defaultValues: {
-      patientId: '',
-      professionalId: '',
-      specialtyId: '',
-      date: '',
-      time: '',
-      notes: '',
-    },
-  });
-
-  function handleProfessionalChange(professional: Professional) {
-    setSelectedProfessional(professional);
-    setValue('specialtyId', professional.specialtyId);
-  }
-
-  async function handleCreate(data: AppointmentFormData) {
-    try {
-      setIsSubmitting(true);
-      setCreateError(null);
-
-      await createAppointment({
-        patientId: data.patientId,
-        professionalId: data.professionalId,
-        specialtyId: data.specialtyId,
-        startAt: toISOStartAt(data.date, data.time),
-        notes: data.notes ? data.notes : undefined,
-      });
-
-      reset({
-        patientId: '',
-        professionalId: '',
-        specialtyId: '',
-        date: '',
-        time: '',
-        notes: '',
-      });
-      setSelectedPatient(null);
-      setSelectedProfessional(null);
-
-      Toast.show({
-        type: 'success',
-        text1: 'Agendamento criado',
-        text2: 'O agendamento foi salvo com sucesso.',
-      });
-
-      setIsModalVisible(false);
-      await loadAppointments(true);
-    } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : 'Não foi possível criar o agendamento.';
-      setCreateError(message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
 
   const hasAppointments = appointments.length > 0;
 
@@ -280,74 +192,6 @@ export default function AppointmentsScreen() {
             onClose={() => setFilterModalVisible(false)}
           />
 
-          {/* Create Modal */}
-          <Modal
-            visible={isModalVisible}
-            animationType="slide"
-            transparent
-            onRequestClose={() => {
-              setIsModalVisible(false);
-              setCreateError(null);
-            }}
-          >
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalSheet}>
-                <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>Novo Agendamento</Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setIsModalVisible(false);
-                      setCreateError(null);
-                    }}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  >
-                    <Ionicons name="close" size={22} color={colors.textMuted} />
-                  </TouchableOpacity>
-                </View>
-
-                <ScrollView
-                  keyboardShouldPersistTaps="handled"
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={styles.modalScrollContent}
-                >
-                  <View style={styles.formContainer}>
-                    {createError ? (
-                      <View style={styles.errorBanner}>
-                        <Ionicons
-                          name="alert-circle-outline"
-                          size={16}
-                          color={colors.danger}
-                        />
-                        <Text style={styles.errorBannerText}>
-                          {createError}
-                        </Text>
-                      </View>
-                    ) : null}
-
-                    <AppointmentFormFields
-                      control={control}
-                      errors={errors}
-                      selectedPatientName={selectedPatient?.fullName}
-                      selectedProfessionalName={selectedProfessional?.fullName}
-                      selectedSpecialtyName={
-                        selectedProfessional?.specialty.name
-                      }
-                      onPatientChange={(p) => setSelectedPatient(p)}
-                      onProfessionalChange={handleProfessionalChange}
-                    />
-                    <View style={styles.buttonContainer}>
-                      <AppButton
-                        title="Criar agendamento"
-                        isLoading={isSubmitting}
-                        onPress={handleSubmit(handleCreate)}
-                      />
-                    </View>
-                  </View>
-                </ScrollView>
-              </View>
-            </View>
-          </Modal>
-
           {/* List */}
           <View style={styles.listSection}>
             <View style={styles.listHeader}>
@@ -395,7 +239,7 @@ export default function AppointmentsScreen() {
             ) : null}
           </View>
 
-          <FAB onPress={() => setIsModalVisible(true)} />
+          <FAB onPress={() => router.push('/appointments/create')} />
         </View>
       </SafeAreaView>
     </KeyboardAvoidingView>
@@ -469,59 +313,4 @@ const styles = StyleSheet.create({
   listTitle: { color: colors.text, fontSize: 17, fontWeight: '700' },
   listCount: { color: colors.textMuted, fontSize: 13, fontWeight: '600' },
   listContent: { gap: 10, paddingBottom: 80 },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    justifyContent: 'flex-end',
-  },
-  modalSheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '90%',
-    paddingBottom: 24,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  modalTitle: { fontSize: 17, fontWeight: '700', color: colors.text },
-  modalScrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  formContainer: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    gap: 14,
-  },
-  buttonContainer: { marginTop: 8 },
-  errorBanner: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-    backgroundColor: '#FDECEA',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#F5B7B1',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  errorBannerText: {
-    flex: 1,
-    fontSize: 13,
-    color: colors.danger,
-    lineHeight: 18,
-    fontWeight: '500',
-  },
 });
