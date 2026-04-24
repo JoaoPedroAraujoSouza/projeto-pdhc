@@ -1,85 +1,56 @@
-# Mobile App
+# Mobile App (Expo)
 
-Aplicativo React Native (Expo Router) do projeto PDHC.
+Aplicativo React Native do projeto PDHC, com rotas públicas de autenticação e rotas protegidas para operação administrativa.
 
 ## Pré-requisitos
 
-- Node.js e npm instalados.
-- Expo CLI via `npx` (não é necessário instalar globalmente).
-- Emulador Android é opcional (também é possível rodar em dispositivo físico com Expo Go).
+- Node.js + npm
+- Expo (via `npx`)
+- Android Emulator ou dispositivo físico (Expo Go)
 
-## Configuração de ambiente (`.env`)
+## Configuração de ambiente
 
-1. Copie o arquivo de exemplo:
+O app consome variáveis `EXPO_PUBLIC_*` geradas automaticamente em `mobile/.env` a partir do `.env` da raiz.
+
+1. Na raiz do projeto, configure:
 
 ```bash
-cp mobile/.env.example mobile/.env
+cp .env.example .env
 ```
 
-2. Preencha no `mobile/.env` as variáveis obrigatórias do projeto (ex.: URL da API e credenciais públicas usadas pelo app).
+2. Preencha ao menos:
 
-## Configuração de rede (obrigatório)
+- `EXPO_PUBLIC_API_URL`
+- `EXPO_PUBLIC_SUPABASE_URL`
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
 
-Defina `EXPO_PUBLIC_API_URL` corretamente de acordo com onde o app vai rodar:
+3. Gere o `mobile/.env`:
 
-- **Emulador Android**:
-
-```env
-EXPO_PUBLIC_API_URL=http://10.0.2.2:3000
+```bash
+npm run sync:mobile-env
 ```
 
-- **Dispositivo físico (mesma rede LAN da sua máquina)**:
-  - Use o IP local da sua máquina, por exemplo:
+> `npm run dev:mobile` e `npm run dev` já executam esse sync automaticamente.
 
-```env
-EXPO_PUBLIC_API_URL=http://192.168.0.10:3000
-```
+## Configuração de rede (`EXPO_PUBLIC_API_URL`)
 
-> `mobile/src/lib/api.ts` adiciona o sufixo `/api` automaticamente.  
-> Exemplo: se `EXPO_PUBLIC_API_URL=http://10.0.2.2:3000`, as requisições irão para `http://10.0.2.2:3000/api`.
+- Android Emulator: `http://10.0.2.2:3000`
+- Dispositivo físico (mesma LAN): `http://192.168.x.x:3000`
 
-## Fluxos de execução
+O app adiciona `/api` automaticamente no cliente HTTP.
 
-### 1) Rodar o ambiente completo pela raiz
+## Como executar
 
 Na raiz do monorepo:
 
-```bash
-npm run dev
-```
+- `npm run dev` → fluxo completo recomendado (supabase + backend + mobile emulador)
+- `npm run dev:mobile` → apenas Expo start
+- `npm run dev:mobile:emulator` → Expo localhost (bom para emulador)
+- `npm run dev:mobile:android` → tenta abrir Android automaticamente
 
-Esse fluxo sobe:
+## Checklist rápido
 
-- Supabase local
-- backend NestJS
-- mobile Expo na porta 8082
-
-### 2) Rodar somente o mobile
-
-Na raiz do monorepo:
-
-```bash
-npm --prefix mobile run emulator
-```
-
-(Equivalente a entrar em `mobile/` e executar `npm run emulator`.)
-
-## Checklist de validação
-
-- [ ] O app inicia sem erro no emulador/dispositivo.
-- [ ] O login/autenticação funciona com as credenciais esperadas.
-- [ ] A listagem de dados do backend é carregada com sucesso no app.
-
-## Erros comuns
-
-- **Timeout da API**
-  - Verifique se backend está rodando e acessível na porta `3000`.
-  - Confirme se `EXPO_PUBLIC_API_URL` está apontando para host correto do contexto (emulador vs dispositivo físico).
-
-- **Host incorreto**
-  - Emulador Android não acessa `localhost` da mesma forma que sua máquina host.
-  - Use `10.0.2.2` no emulador ou IP LAN em dispositivo físico.
-
-- **Supabase URL incorreta**
-  - Revise variáveis do `.env` copiadas de `mobile/.env.example`.
-  - Garanta que a URL/keys utilizadas correspondem ao ambiente em execução.
+- app inicia sem erro
+- login/cadastro funcionam
+- listagens de especialidades/profissionais/pacientes carregam
+- criação/edição de consulta funciona com backend autenticado

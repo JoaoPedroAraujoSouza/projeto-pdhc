@@ -1,9 +1,11 @@
 # Delivery Plan
 
 ## Objetivo
+
 Organizar a execução do MVP do HospAgenda de forma pragmática, reduzindo riscos e garantindo foco nas entregas que mais contribuem para a qualidade final do projeto.
 
 ## Estratégia geral
+
 A entrega será conduzida em fases curtas e orientadas a risco. O fluxo técnico prioriza:
 
 1. definição e organização do projeto
@@ -14,7 +16,9 @@ A entrega será conduzida em fases curtas e orientadas a risco. O fluxo técnico
 6. testes e refinamento final
 
 ## Fase 1 — Estrutura inicial e documentação
+
 ### Objetivos
+
 - criar o repositório
 - definir estrutura do monorepo
 - criar os documentos base
@@ -23,6 +27,7 @@ A entrega será conduzida em fases curtas e orientadas a risco. O fluxo técnico
 - preparar GitHub Actions inicial
 
 ### Entregas esperadas
+
 - repositório criado
 - pasta `docs/` preenchida com base inicial
 - Project configurado
@@ -30,7 +35,9 @@ A entrega será conduzida em fases curtas e orientadas a risco. O fluxo técnico
 - workflows básicos de CI criados
 
 ## Fase 2 — Setup técnico e autenticação
+
 ### Objetivos
+
 - subir Supabase local
 - configurar backend NestJS
 - configurar app React Native
@@ -39,24 +46,30 @@ A entrega será conduzida em fases curtas e orientadas a risco. O fluxo técnico
 - expor rota protegida mínima
 
 ### Entregas esperadas
+
 - ambiente local funcional
 - fluxo de login/cadastro funcionando
 - rota `/auth/me` funcionando com proteção
 
 ## Fase 3 — Cadastros base no backend
+
 ### Objetivos
+
 - implementar especialidades
 - implementar profissionais
 - implementar pacientes
 - documentar endpoints no Swagger
 
 ### Entregas esperadas
+
 - endpoints funcionando
 - validações básicas implementadas
 - documentação inicial da API disponível
 
 ## Fase 4 — Agendamentos no backend
+
 ### Objetivos
+
 - implementar criação de consulta
 - implementar listagem com filtros
 - implementar confirmação
@@ -67,24 +80,30 @@ A entrega será conduzida em fases curtas e orientadas a risco. O fluxo técnico
 - validar data passada
 
 ### Entregas esperadas
+
 - núcleo do domínio funcionando
 - regras principais implementadas
 - endpoints documentados
 
 ## Fase 5 — Dashboard e integração mobile
+
 ### Objetivos
+
 - implementar endpoint de dashboard do dia
 - criar telas principais do app
 - conectar formulários e listagens com a API
 - permitir execução dos fluxos administrativos principais
 
 ### Entregas esperadas
+
 - dashboard funcional
 - app autenticado consumindo a API
 - criação e gestão de agendamentos via interface mobile
 
 ## Fase 6 — Testes e refinamento
+
 ### Objetivos
+
 - criar testes unitários do domínio de agendamento
 - criar testes de integração prioritários
 - revisar documentação
@@ -92,12 +111,15 @@ A entrega será conduzida em fases curtas e orientadas a risco. O fluxo técnico
 - capturar evidências visuais do projeto
 
 ### Entregas esperadas
+
 - suíte mínima de testes concluída
 - documentação revisada
 - projeto preparado para submissão
 
 ## Sugestão de distribuição por dias
+
 ### Dia 1
+
 - repositório
 - docs base
 - GitHub Projects
@@ -105,34 +127,41 @@ A entrega será conduzida em fases curtas e orientadas a risco. O fluxo técnico
 - Supabase local
 
 ### Dia 2
+
 - autenticação fim a fim
 - especialidades
 - profissionais
 - pacientes
 
 ### Dia 3
+
 - agendamentos
 - conflito de horário
 - regras de status
 
 ### Dia 4
+
 - dashboard
 - integração mobile base
 - listagens principais
 
 ### Dia 5
+
 - formulários e ações de agendamento
 - testes de backend
 - ajustes de UX
 
 ### Dia 6
+
 - CI
 - revisão final
 - README final
 - screenshots e preparação de entrega
 
 ## Critérios de prioridade
+
 ### Prioridade máxima
+
 - autenticação
 - criação de consulta
 - conflito de horário
@@ -141,15 +170,18 @@ A entrega será conduzida em fases curtas e orientadas a risco. O fluxo técnico
 - testes centrais
 
 ### Prioridade média
+
 - dashboard
 - filtros completos
 - refinamento visual
 
 ### Prioridade baixa
+
 - polimento adicional de interface
 - melhorias não essenciais
 
 ## Critérios de corte
+
 Se o prazo apertar, reduzir nesta ordem:
 
 1. refinamentos visuais mais avançados
@@ -166,6 +198,7 @@ Não reduzir:
 - testes principais
 
 ## Resultado esperado ao final
+
 Ao final da execução, o projeto deve apresentar:
 
 - arquitetura coerente
@@ -177,15 +210,16 @@ Ao final da execução, o projeto deve apresentar:
 - organização profissional do processo de desenvolvimento
 
 ## Demo em 10 minutos
+
 Esta seção descreve um roteiro direto para demonstração funcional do MVP.
 
 ### 1) Comandos exatos para subir o ambiente
+
 No diretório raiz do projeto:
 
 ```bash
+cp .env.example .env
 npm run setup
-cp backend/.env.example backend/.env
-cp mobile/.env.example mobile/.env
 npm run supabase:start
 npm run dev:backend
 ```
@@ -197,21 +231,25 @@ npm run dev:mobile
 ```
 
 Referências úteis durante a demo:
+
 - Swagger: `http://localhost:3000/docs`
 - API base: `http://localhost:3000/api`
 
 ### 2) Criação de usuário no app (sign-up) e login
+
 1. Abrir o app e acessar a tela de cadastro (`Sign up`).
 2. Informar e-mail válido e senha.
 3. Concluir cadastro e, em seguida, acessar a tela de login (`Sign in`).
 4. Autenticar com o mesmo e-mail/senha.
 
 **Resultado esperado**
+
 - Login concluído com sucesso.
 - Usuário redirecionado para área protegida (dashboard/listas).
 - Requisições autenticadas passam a funcionar sem erro `401`.
 
 ### 3) Sequência mínima de uso (fluxo obrigatório)
+
 Executar nesta ordem para evitar dependências quebradas:
 
 1. **Cadastrar especialidade**
@@ -239,6 +277,7 @@ Executar nesta ordem para evitar dependências quebradas:
    - **Resultado esperado:** status final da consulta refletido corretamente no detalhe/listagem.
 
 ### 4) Verificação de API no Swagger para cada fluxo
+
 No Swagger (`/docs`), clicar em **Authorize** e informar:
 `Bearer <access_token>`.
 
@@ -268,6 +307,7 @@ Validar os endpoints abaixo em paralelo à navegação no app:
    - `PATCH /api/appointments/{id}/complete`
 
 ### 5) Resultado esperado por etapa (checklist para avaliação)
+
 - **Ambiente iniciado:** backend responde e Swagger abre em `http://localhost:3000/docs`.
 - **Usuário autenticado:** login no app funcionando e rotas protegidas acessíveis.
 - **Especialidade criada:** retorno `201` no POST e item visível no GET.

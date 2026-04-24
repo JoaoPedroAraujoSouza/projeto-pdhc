@@ -1,115 +1,102 @@
 # API Contract
 
 ## Convenções gerais
-### Base URL
-A URL base será definida por ambiente. Em desenvolvimento local:
 
-- backend NestJS: `http://127.0.0.1:3000`
-- prefixo global obrigatório das rotas da API: `/api`
-- Supabase API local: `http://127.0.0.1:54321`
-- Postgres local (Supabase): `127.0.0.1:54322`
+### Base local
 
-Em dispositivo físico, o mobile deve usar o IP da máquina na LAN, preservando porta e prefixo (ex.: `http://192.168.0.10:3000/api`).
+- API backend: `http://127.0.0.1:3000`
+- Prefixo global: `/api`
+- Swagger: `http://127.0.0.1:3000/docs`
 
-### Prefixo de rotas
-Todas as rotas deste contrato são servidas sob o prefixo `/api`.
-
-Exemplos:
-- `/api/auth/me`
-- `/api/patients`
-- `/api/appointments/:id/confirm`
+Em dispositivo físico, use o IP da máquina na LAN para `EXPO_PUBLIC_API_URL` (ex.: `http://192.168.0.10:3000`). O mobile adiciona `/api` automaticamente.
 
 ### Autenticação
-As rotas protegidas exigem bearer token no header:
+
+Rotas protegidas exigem header:
 
 ```http
 Authorization: Bearer <access_token>
 ```
 
-O token será emitido pelo Supabase Auth e validado pela API NestJS.
+O token é emitido pelo Supabase Auth e validado pela API NestJS.
 
-### Formato de resposta
-O projeto pode adotar resposta direta por recurso ou um padrão padronizado. Para o MVP, a prioridade é manter consistência simples e clareza.
+### Erros (padrão NestJS)
+
+```json
+{
+  "statusCode": 409,
+  "message": "The selected professional already has an appointment in this time slot.",
+  "error": "Conflict"
+}
+```
 
 ## Auth
-### GET `/api/auth/me`
-Retorna os dados básicos do usuário autenticado.
 
-#### Resposta esperada
+### GET `/api/auth/me`
+
+Retorna dados do usuário autenticado extraídos do token.
+
 ```json
 {
   "id": "user-id",
-  "email": "user@example.com"
+  "email": "user@example.com",
+  "role": "authenticated",
+  "appMetadata": {},
+  "userMetadata": {}
 }
 ```
 
 ## Specialties
-### POST `/api/specialties`
-Cria uma nova especialidade.
 
-#### Request body
+### POST `/api/specialties`
+
 ```json
 {
   "name": "Cardiologia"
 }
 ```
 
-#### Regras
-- nome é obrigatório
-- nome deve ser válido e não vazio
+Regras:
+
+- `name` obrigatório
+- nome único
 
 ### GET `/api/specialties`
-Lista especialidades cadastradas.
 
-#### Resposta esperada
-```json
-[
-  {
-    "id": "specialty-id",
-    "name": "Cardiologia",
-    "createdAt": "2026-04-18T10:00:00.000Z"
-  }
-]
-```
+Lista especialidades.
 
 ## Professionals
-### POST `/api/professionals`
-Cria um profissional.
 
-#### Request body
+### POST `/api/professionals`
+
 ```json
 {
-  "fullName": "Dr. João Silva",
+  "fullName": "Dra. Ana Lima",
   "specialtyId": "specialty-id"
 }
 ```
 
-#### Regras
-- nome é obrigatório
+Regras:
+
+- `fullName` obrigatório
 - `specialtyId` deve existir
-- um profissional possui apenas uma especialidade
 
 ### GET `/api/professionals`
+
 Lista profissionais.
 
 ### GET `/api/professionals/:id`
-Retorna detalhes de um profissional.
+
+Detalha profissional.
 
 ### PATCH `/api/professionals/:id`
-Edita dados do profissional.
 
-#### Request body
-```json
-{
-  "fullName": "Dr. João Pedro Silva"
-}
-```
+Atualiza nome e/ou especialidade.
 
 ## Patients
-### POST `/api/patients`
-Cria um paciente.
 
-#### Request body
+### POST `/api/patients`
+
 ```json
 {
   "fullName": "Maria de Souza",
@@ -119,26 +106,27 @@ Cria um paciente.
 }
 ```
 
-#### Regras
-- nome é obrigatório
-- CPF deve ter formato válido conforme a regra escolhida no MVP
-- data de nascimento é obrigatória
-- telefone é obrigatório no MVP apenas se isso fizer sentido no fluxo
+Regras:
+
+- campos obrigatórios: `fullName`, `cpf`, `birthDate`, `phone`
+- `cpf` deve ser único
 
 ### GET `/api/patients`
+
 Lista pacientes.
 
 ### GET `/api/patients/:id`
-Retorna detalhes de um paciente.
+
+Detalha paciente.
 
 ### PATCH `/api/patients/:id`
-Edita dados do paciente.
+
+Atualiza paciente.
 
 ## Appointments
-### POST `/api/appointments`
-Cria um agendamento.
 
-#### Request body
+### POST `/api/appointments`
+
 ```json
 {
   "patientId": "patient-id",
@@ -148,125 +136,86 @@ Cria um agendamento.
 }
 ```
 
-#### Regras
-- `patientId` deve existir
-- `professionalId` deve existir
-- não permitir agendamento no passado
-- não permitir conflito de horário para o mesmo profissional
-- `specialtyId` pode ser derivado do profissional no backend
+Regras:
 
-#### Resposta esperada
-```json
-{
-  "id": "appointment-id",
-  "patientId": "patient-id",
-  "professionalId": "professional-id",
-  "specialtyId": "specialty-id",
-  "startAt": "2026-04-20T14:00:00.000Z",
-  "status": "SCHEDULED",
-  "notes": "Primeira consulta",
-  "createdAt": "2026-04-18T12:00:00.000Z",
-  "updatedAt": "2026-04-18T12:00:00.000Z"
-}
-```
+- `patientId` e `professionalId` devem existir
+- não permitir horário no passado
+- não permitir conflito para o mesmo profissional
+- `specialtyId` é derivado do profissional
 
 ### GET `/api/appointments`
-Lista agendamentos.
 
-#### Filtros suportados
-- `date`
+Lista com filtros opcionais:
+
+- `date` (`YYYY-MM-DD`)
 - `status`
 - `professionalId`
 - `specialtyId`
 
-#### Exemplo
+Exemplo:
+
 ```http
-GET /api/appointments?date=2026-04-20&status=SCHEDULED&professionalId=professional-id
+GET /api/appointments?date=2026-04-20&status=SCHEDULED
 ```
 
 ### GET `/api/appointments/:id`
-Retorna detalhes de um agendamento.
+
+Detalha agendamento.
 
 ### PATCH `/api/appointments/:id/confirm`
-Confirma um agendamento.
 
-#### Regras
-- só pode confirmar consulta ativa
-- não faz sentido confirmar consulta cancelada ou concluída
+Confirma consulta em `SCHEDULED`.
 
 ### PATCH `/api/appointments/:id/reschedule`
-Remarca um agendamento.
 
-#### Request body
 ```json
 {
   "startAt": "2026-04-21T10:30:00.000Z"
 }
 ```
 
-#### Regras
-- deve validar novamente data futura
-- deve validar novamente conflito de horário
+Revalida data e conflito.
 
 ### PATCH `/api/appointments/:id/cancel`
-Cancela um agendamento.
 
-#### Regras
-- não remove o registro fisicamente
-- apenas altera o status para `CANCELLED`
+Marca como `CANCELLED`.
 
 ### PATCH `/api/appointments/:id/complete`
-Conclui um agendamento.
 
-#### Regras
-- só pode concluir consulta não cancelada
+Marca como `COMPLETED` (somente consulta ativa).
 
 ## Dashboard
-### GET `/api/dashboard/today`
-Retorna resumo dos atendimentos do dia.
 
-#### Exemplo de resposta
+### GET `/api/dashboard/today`
+
+Parâmetro opcional:
+
+- `date` (`YYYY-MM-DD`) — se omitido, usa o dia atual do servidor.
+
+Exemplo:
+
+```http
+GET /api/dashboard/today?date=2026-04-21
+```
+
+Exemplo de resposta:
+
 ```json
 {
-  "date": "2026-04-18",
+  "date": "2026-04-21",
   "scheduled": 8,
   "confirmed": 4,
   "cancelled": 1,
   "completed": 2,
-  "nextAppointments": [
-    {
-      "id": "appointment-id",
-      "patientName": "Maria de Souza",
-      "professionalName": "Dr. João Silva",
-      "startAt": "2026-04-18T14:00:00.000Z",
-      "status": "CONFIRMED"
-    }
-  ]
+  "nextAppointments": []
 }
 ```
 
-## Padrão de erros
-Os erros devem seguir um padrão consistente e legível para o mobile.
+## Códigos de status mais comuns
 
-### Exemplos importantes
-- `401 Unauthorized` para token ausente ou inválido
-- `404 Not Found` para recurso inexistente
-- `409 Conflict` para conflito de horário
-- `400 Bad Request` para dados inválidos
-
-### Exemplo de erro
-```json
-{
-  "statusCode": 409,
-  "message": "The selected professional already has an appointment in this time slot.",
-  "error": "Conflict"
-}
-```
-
-## Observações de implementação
-- a documentação definitiva dos endpoints será refletida no Swagger/OpenAPI
-- este arquivo serve como contrato inicial entre backend e mobile
-- alterações relevantes nos payloads devem atualizar este documento
-
-## Nota de sincronização documental
-Sempre que houver mudança de rota, script ou variável de ambiente, atualizar este contrato e a documentação relacionada (`README.md` e `docs/architecture.md`) no mesmo conjunto de mudanças.
+- `200 OK` / `201 Created`
+- `400 Bad Request`
+- `401 Unauthorized`
+- `404 Not Found`
+- `409 Conflict`
+- `422 Unprocessable Entity`
