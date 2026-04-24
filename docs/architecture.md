@@ -56,7 +56,7 @@ Essa decisão reduz a complexidade inicial do projeto, acelera a implementação
 
 ## Estrutura do monorepo
 ```text
-hospagenda/
+projeto-pdhc/
   backend/
   mobile/
   docs/
@@ -89,16 +89,27 @@ backend/
 ## Estrutura do mobile
 ```text
 mobile/
+  app/
+    _layout.tsx
+    index.tsx
+    auth/
+    (protected)/
   src/
-    screens/
     components/
     services/
     hooks/
-    navigation/
     types/
     utils/
     constants/
 ```
+
+## Portas e endpoints locais
+- backend NestJS: `http://127.0.0.1:3000`
+- prefixo global de rotas do backend: `/api`
+- Supabase API local: `http://127.0.0.1:54321`
+- Postgres local (Supabase): `127.0.0.1:54322`
+
+Exemplo completo de endpoint protegido no ambiente local: `http://127.0.0.1:3000/api/auth/me`.
 
 ## Módulos do backend
 ### Auth
@@ -200,3 +211,6 @@ Os status do agendamento serão:
 - sem múltiplas especialidades por profissional
 
 Esses trade-offs são intencionais e visam maximizar a qualidade do núcleo do sistema dentro do prazo disponível.
+
+## Nota de sincronização documental
+Qualquer alteração de rota, script ou variável de ambiente deve ser acompanhada de atualização imediata da documentação (`README.md`, `docs/architecture.md`, `docs/api-contract.md` e demais docs impactados).
