@@ -65,6 +65,26 @@ Equipe administrativa hospitalar responsável por cadastrar pacientes, manter pr
 - ESLint
 - Prettier
 
+## Setup local rápido
+
+1. `cp .env.example .env`
+2. `npm run setup`
+3. `npm run supabase:start`
+4. `npm run dev`
+
+### Variáveis Supabase (referência do `supabase status`)
+
+| Nome no `supabase status` | Nome no `.env` raiz | Serviço consumidor | Obrigatório? |
+| --- | --- | --- | --- |
+| API URL | `SUPABASE_URL` | backend e mobile | obrigatório |
+| anon key | `SUPABASE_ANON_KEY` | backend e mobile | obrigatório |
+| service_role key | `SUPABASE_SERVICE_ROLE_KEY` | backend | obrigatório |
+| JWT secret | `SUPABASE_JWT_SECRET` | backend | obrigatório |
+| DB URL | `DATABASE_URL` | backend | obrigatório |
+| _(não vem do Supabase status)_ | `EXPO_PUBLIC_APP_ENV` | mobile | opcional |
+
+> Observação: no mobile, use os equivalentes `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_ANON_KEY` no `.env` de `mobile/` para apontar para o host correto (emulador/dispositivo físico).
+
 ## Arquitetura
 
 ```text
@@ -277,6 +297,15 @@ O projeto será organizado com:
 3. iniciar o backend NestJS
 4. iniciar o app mobile
 5. autenticar e validar o fluxo ponta a ponta
+
+### Mapeamento de variáveis do Supabase
+
+Para evitar ambiguidade entre os nomes exibidos pela Supabase CLI e os nomes usados no projeto, utilize o mapeamento abaixo:
+
+| Origem (Supabase CLI) | Variável no projeto | Onde usar |
+| --- | --- | --- |
+| `anon key` / `ANON_KEY` | `SUPABASE_ANON_KEY` | backend |
+| `anon key` / `ANON_KEY` | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | mobile (Expo) |
 
 > Observação: durante o desenvolvimento mobile, a API deve ser consumida pelo IP da máquina hospedeira, e não por `localhost`, quando o app estiver rodando em dispositivo físico.
 
