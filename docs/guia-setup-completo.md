@@ -183,6 +183,8 @@ npm run dev:mobile:emulator
 
 ### Opção B — Com Docker (serviços em container)
 
+> Se o build do Docker do backend falhar com `PrismaConfigEnvError: Cannot resolve environment variable: DATABASE_URL`, confirme que o arquivo `.env` existe na raiz e contém `DATABASE_URL`.
+
 ```bash
 npm run docker:up
 npm run docker:logs
