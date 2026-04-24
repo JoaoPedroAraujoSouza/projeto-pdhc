@@ -64,8 +64,9 @@ A **fonte de verdade** é o arquivo `.env` na raiz. O script `npm run sync:mobil
 | `SUPABASE_ANON_KEY`             | Backend e mobile                                    |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Backend                                             |
 | `SUPABASE_JWT_SECRET`           | Backend                                             |
-| `DATABASE_URL`                  | Prisma / backend (runtime via pooler)              |
-| `DATABASE_DIRECT_URL`           | Prisma migrations/db push (conexão direta)         |
+| `DATABASE_POOLER_URL`           | Backend runtime no Docker/Windows (pooler IPv4)    |
+| `DATABASE_URL`                  | Prisma CLI (`db push`/migrations)                  |
+| `DATABASE_DIRECT_URL`           | Prisma migrations avançadas (`directUrl`)          |
 | `EXPO_PUBLIC_SUPABASE_URL`      | Mobile                                              |
 | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Mobile                                              |
 | `EXPO_PUBLIC_API_URL`           | Mobile (sem `/api`, o app adiciona automaticamente) |

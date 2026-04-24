@@ -110,7 +110,8 @@ SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_ANON_KEY=<anon_key>
 SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
 SUPABASE_JWT_SECRET=<jwt_secret>
-DATABASE_URL=postgresql://postgres.<project-ref>:<senha>@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require
+DATABASE_POOLER_URL=postgresql://postgres.<project-ref>:<senha>@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require
+DATABASE_URL=postgresql://postgres:<senha>@db.<project-ref>.supabase.co:5432/postgres?sslmode=require
 DATABASE_DIRECT_URL=postgresql://postgres:<senha>@db.<project-ref>.supabase.co:5432/postgres?sslmode=require
 
 # Mobile
@@ -226,8 +227,8 @@ Se login falhar:
 - Confira `DATABASE_URL`.
 - Garanta `sslmode=require`.
 - Confirme se a senha do banco está correta.
-- Se aparecer `ENETUNREACH` com IPv6 no Docker/Windows, use pooler IPv4 em `DATABASE_URL` (`*.pooler.supabase.com:6543`).
-- Mantenha `DATABASE_DIRECT_URL` (porta `5432`) para `prisma db push` e migrations.
+- Se aparecer `ENETUNREACH` com IPv6 no Docker/Windows, configure `DATABASE_POOLER_URL` com pooler IPv4 (`*.pooler.supabase.com:6543`).
+- Mantenha `DATABASE_URL`/`DATABASE_DIRECT_URL` (porta `5432`) para `prisma db push` e migrations.
 
 ### Mobile não acha backend
 
