@@ -175,3 +175,106 @@ Ao final da execução, o projeto deve apresentar:
 - documentação clara
 - evidência de testes
 - organização profissional do processo de desenvolvimento
+
+## Demo em 10 minutos
+Esta seção descreve um roteiro direto para demonstração funcional do MVP.
+
+### 1) Comandos exatos para subir o ambiente
+No diretório raiz do projeto:
+
+```bash
+npm run setup
+cp backend/.env.example backend/.env
+cp mobile/.env.example mobile/.env
+npm run supabase:start
+npm run dev:backend
+```
+
+Em outro terminal (na raiz), subir o app:
+
+```bash
+npm run dev:mobile
+```
+
+Referências úteis durante a demo:
+- Swagger: `http://localhost:3000/docs`
+- API base: `http://localhost:3000/api`
+
+### 2) Criação de usuário no app (sign-up) e login
+1. Abrir o app e acessar a tela de cadastro (`Sign up`).
+2. Informar e-mail válido e senha.
+3. Concluir cadastro e, em seguida, acessar a tela de login (`Sign in`).
+4. Autenticar com o mesmo e-mail/senha.
+
+**Resultado esperado**
+- Login concluído com sucesso.
+- Usuário redirecionado para área protegida (dashboard/listas).
+- Requisições autenticadas passam a funcionar sem erro `401`.
+
+### 3) Sequência mínima de uso (fluxo obrigatório)
+Executar nesta ordem para evitar dependências quebradas:
+
+1. **Cadastrar especialidade**
+   - Exemplo: `Cardiologia`.
+   - **Resultado esperado:** item aparece na listagem de especialidades.
+
+2. **Cadastrar profissional**
+   - Exemplo: `Dra. Ana Lima`, vinculada à especialidade criada.
+   - **Resultado esperado:** profissional aparece na listagem com especialidade associada.
+
+3. **Cadastrar paciente**
+   - Exemplo: nome, CPF, data de nascimento e telefone válidos.
+   - **Resultado esperado:** paciente aparece na listagem de pacientes.
+
+4. **Criar consulta**
+   - Selecionar paciente + profissional.
+   - Definir `startAt` no futuro.
+   - **Resultado esperado:** consulta criada com status inicial `SCHEDULED`.
+
+5. **Executar ação de status (escolher ao menos uma)**
+   - Confirmar: `CONFIRMED`
+   - Remarcar: atualiza data/hora e mantém consulta ativa
+   - Cancelar: `CANCELLED`
+   - Concluir: `COMPLETED`
+   - **Resultado esperado:** status final da consulta refletido corretamente no detalhe/listagem.
+
+### 4) Verificação de API no Swagger para cada fluxo
+No Swagger (`/docs`), clicar em **Authorize** e informar:
+`Bearer <access_token>`.
+
+Validar os endpoints abaixo em paralelo à navegação no app:
+
+1. **Especialidade**
+   - `POST /api/specialties`
+   - `GET /api/specialties`
+
+2. **Profissional**
+   - `POST /api/professionals`
+   - `GET /api/professionals`
+
+3. **Paciente**
+   - `POST /api/patients`
+   - `GET /api/patients`
+
+4. **Consulta**
+   - `POST /api/appointments`
+   - `GET /api/appointments`
+   - `GET /api/appointments/{id}`
+
+5. **Ações de status**
+   - `PATCH /api/appointments/{id}/confirm`
+   - `PATCH /api/appointments/{id}/reschedule`
+   - `PATCH /api/appointments/{id}/cancel`
+   - `PATCH /api/appointments/{id}/complete`
+
+### 5) Resultado esperado por etapa (checklist para avaliação)
+- **Ambiente iniciado:** backend responde e Swagger abre em `http://localhost:3000/docs`.
+- **Usuário autenticado:** login no app funcionando e rotas protegidas acessíveis.
+- **Especialidade criada:** retorno `201` no POST e item visível no GET.
+- **Profissional criado:** retorno `201` no POST e vínculo com especialidade válido.
+- **Paciente criado:** retorno `201` no POST e item disponível em listagem.
+- **Consulta criada:** retorno `201` e `status = SCHEDULED`.
+- **Ação de status aplicada:** retorno `200` no PATCH e status atualizado conforme ação.
+- **Validação de regras (opcional):**
+  - tentativa de consulta no passado retorna `400`;
+  - tentativa de conflito de horário retorna `409`.

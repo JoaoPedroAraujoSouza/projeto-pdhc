@@ -2,7 +2,22 @@
 
 ## Convenções gerais
 ### Base URL
-A URL base será definida por ambiente. Em desenvolvimento local, a aplicação mobile consumirá a API NestJS utilizando o IP da máquina na rede local, e não `localhost` diretamente no dispositivo físico.
+A URL base será definida por ambiente. Em desenvolvimento local:
+
+- backend NestJS: `http://127.0.0.1:3000`
+- prefixo global obrigatório das rotas da API: `/api`
+- Supabase API local: `http://127.0.0.1:54321`
+- Postgres local (Supabase): `127.0.0.1:54322`
+
+Em dispositivo físico, o mobile deve usar o IP da máquina na LAN, preservando porta e prefixo (ex.: `http://192.168.0.10:3000/api`).
+
+### Prefixo de rotas
+Todas as rotas deste contrato são servidas sob o prefixo `/api`.
+
+Exemplos:
+- `/api/auth/me`
+- `/api/patients`
+- `/api/appointments/:id/confirm`
 
 ### Autenticação
 As rotas protegidas exigem bearer token no header:
@@ -17,7 +32,7 @@ O token será emitido pelo Supabase Auth e validado pela API NestJS.
 O projeto pode adotar resposta direta por recurso ou um padrão padronizado. Para o MVP, a prioridade é manter consistência simples e clareza.
 
 ## Auth
-### GET `/auth/me`
+### GET `/api/auth/me`
 Retorna os dados básicos do usuário autenticado.
 
 #### Resposta esperada
@@ -29,7 +44,7 @@ Retorna os dados básicos do usuário autenticado.
 ```
 
 ## Specialties
-### POST `/specialties`
+### POST `/api/specialties`
 Cria uma nova especialidade.
 
 #### Request body
@@ -43,7 +58,7 @@ Cria uma nova especialidade.
 - nome é obrigatório
 - nome deve ser válido e não vazio
 
-### GET `/specialties`
+### GET `/api/specialties`
 Lista especialidades cadastradas.
 
 #### Resposta esperada
@@ -58,7 +73,7 @@ Lista especialidades cadastradas.
 ```
 
 ## Professionals
-### POST `/professionals`
+### POST `/api/professionals`
 Cria um profissional.
 
 #### Request body
@@ -74,13 +89,13 @@ Cria um profissional.
 - `specialtyId` deve existir
 - um profissional possui apenas uma especialidade
 
-### GET `/professionals`
+### GET `/api/professionals`
 Lista profissionais.
 
-### GET `/professionals/:id`
+### GET `/api/professionals/:id`
 Retorna detalhes de um profissional.
 
-### PATCH `/professionals/:id`
+### PATCH `/api/professionals/:id`
 Edita dados do profissional.
 
 #### Request body
@@ -91,7 +106,7 @@ Edita dados do profissional.
 ```
 
 ## Patients
-### POST `/patients`
+### POST `/api/patients`
 Cria um paciente.
 
 #### Request body
@@ -110,17 +125,17 @@ Cria um paciente.
 - data de nascimento é obrigatória
 - telefone é obrigatório no MVP apenas se isso fizer sentido no fluxo
 
-### GET `/patients`
+### GET `/api/patients`
 Lista pacientes.
 
-### GET `/patients/:id`
+### GET `/api/patients/:id`
 Retorna detalhes de um paciente.
 
-### PATCH `/patients/:id`
+### PATCH `/api/patients/:id`
 Edita dados do paciente.
 
 ## Appointments
-### POST `/appointments`
+### POST `/api/appointments`
 Cria um agendamento.
 
 #### Request body
@@ -155,7 +170,7 @@ Cria um agendamento.
 }
 ```
 
-### GET `/appointments`
+### GET `/api/appointments`
 Lista agendamentos.
 
 #### Filtros suportados
@@ -166,20 +181,20 @@ Lista agendamentos.
 
 #### Exemplo
 ```http
-GET /appointments?date=2026-04-20&status=SCHEDULED&professionalId=professional-id
+GET /api/appointments?date=2026-04-20&status=SCHEDULED&professionalId=professional-id
 ```
 
-### GET `/appointments/:id`
+### GET `/api/appointments/:id`
 Retorna detalhes de um agendamento.
 
-### PATCH `/appointments/:id/confirm`
+### PATCH `/api/appointments/:id/confirm`
 Confirma um agendamento.
 
 #### Regras
 - só pode confirmar consulta ativa
 - não faz sentido confirmar consulta cancelada ou concluída
 
-### PATCH `/appointments/:id/reschedule`
+### PATCH `/api/appointments/:id/reschedule`
 Remarca um agendamento.
 
 #### Request body
@@ -193,21 +208,21 @@ Remarca um agendamento.
 - deve validar novamente data futura
 - deve validar novamente conflito de horário
 
-### PATCH `/appointments/:id/cancel`
+### PATCH `/api/appointments/:id/cancel`
 Cancela um agendamento.
 
 #### Regras
 - não remove o registro fisicamente
 - apenas altera o status para `CANCELLED`
 
-### PATCH `/appointments/:id/complete`
+### PATCH `/api/appointments/:id/complete`
 Conclui um agendamento.
 
 #### Regras
 - só pode concluir consulta não cancelada
 
 ## Dashboard
-### GET `/dashboard/today`
+### GET `/api/dashboard/today`
 Retorna resumo dos atendimentos do dia.
 
 #### Exemplo de resposta
@@ -252,3 +267,6 @@ Os erros devem seguir um padrão consistente e legível para o mobile.
 - a documentação definitiva dos endpoints será refletida no Swagger/OpenAPI
 - este arquivo serve como contrato inicial entre backend e mobile
 - alterações relevantes nos payloads devem atualizar este documento
+
+## Nota de sincronização documental
+Sempre que houver mudança de rota, script ou variável de ambiente, atualizar este contrato e a documentação relacionada (`README.md` e `docs/architecture.md`) no mesmo conjunto de mudanças.

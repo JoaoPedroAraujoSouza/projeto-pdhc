@@ -65,6 +65,26 @@ Equipe administrativa hospitalar responsável por cadastrar pacientes, manter pr
 - ESLint
 - Prettier
 
+## Setup local rápido
+
+1. `cp .env.example .env`
+2. `npm run setup`
+3. `npm run supabase:start`
+4. `npm run dev`
+
+### Variáveis Supabase (referência do `supabase status`)
+
+| Nome no `supabase status` | Nome no `.env` raiz | Serviço consumidor | Obrigatório? |
+| --- | --- | --- | --- |
+| API URL | `SUPABASE_URL` | backend e mobile | obrigatório |
+| anon key | `SUPABASE_ANON_KEY` | backend e mobile | obrigatório |
+| service_role key | `SUPABASE_SERVICE_ROLE_KEY` | backend | obrigatório |
+| JWT secret | `SUPABASE_JWT_SECRET` | backend | obrigatório |
+| DB URL | `DATABASE_URL` | backend | obrigatório |
+| _(não vem do Supabase status)_ | `EXPO_PUBLIC_APP_ENV` | mobile | opcional |
+
+> Observação: no mobile, use os equivalentes `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_ANON_KEY` no `.env` de `mobile/` para apontar para o host correto (emulador/dispositivo físico).
+
 ## Arquitetura
 
 ```text
@@ -140,7 +160,7 @@ PostgreSQL + Auth (Supabase local)
 ## Estrutura do repositório
 
 ```text
-hospagenda/
+projeto-pdhc/
   backend/
   mobile/
   docs/
@@ -166,12 +186,15 @@ backend/
 
 ```text
 mobile/
+  app/
+    _layout.tsx
+    index.tsx
+    auth/
+    (protected)/
   src/
-    screens/
     components/
     services/
     hooks/
-    navigation/
     types/
     utils/
     constants/
@@ -180,35 +203,45 @@ mobile/
 ## Endpoints do MVP
 
 ### Auth
-- `GET /auth/me`
+- `GET /api/auth/me`
 
 ### Specialties
-- `POST /specialties`
-- `GET /specialties`
+- `POST /api/specialties`
+- `GET /api/specialties`
 
 ### Professionals
-- `POST /professionals`
-- `GET /professionals`
-- `GET /professionals/:id`
-- `PATCH /professionals/:id`
+- `POST /api/professionals`
+- `GET /api/professionals`
+- `GET /api/professionals/:id`
+- `PATCH /api/professionals/:id`
 
 ### Patients
-- `POST /patients`
-- `GET /patients`
-- `GET /patients/:id`
-- `PATCH /patients/:id`
+- `POST /api/patients`
+- `GET /api/patients`
+- `GET /api/patients/:id`
+- `PATCH /api/patients/:id`
 
 ### Appointments
-- `POST /appointments`
-- `GET /appointments`
-- `GET /appointments/:id`
-- `PATCH /appointments/:id/confirm`
-- `PATCH /appointments/:id/reschedule`
-- `PATCH /appointments/:id/cancel`
-- `PATCH /appointments/:id/complete`
+- `POST /api/appointments`
+- `GET /api/appointments`
+- `GET /api/appointments/:id`
+- `PATCH /api/appointments/:id/confirm`
+- `PATCH /api/appointments/:id/reschedule`
+- `PATCH /api/appointments/:id/cancel`
+- `PATCH /api/appointments/:id/complete`
 
 ### Dashboard
-- `GET /dashboard/today`
+- `GET /api/dashboard/today`
+
+## Portas e URLs locais
+
+- backend NestJS: `http://127.0.0.1:3000` com prefixo global `api`
+- Supabase API local: `http://127.0.0.1:54321`
+- Postgres local (Supabase): `127.0.0.1:54322`
+
+## Nota de sincronização documental
+
+Sempre que houver mudança de rota, script ou variável de ambiente, atualize `README.md` e os arquivos em `docs/` no mesmo ciclo de alteração para manter contrato, arquitetura e setup alinhados.
 
 ## Fluxos principais
 
@@ -264,128 +297,59 @@ O projeto será organizado com:
 
 ## Como rodar o projeto (passo a passo)
 
-### 1) Pré-requisitos (versões mínimas)
+### Pré-requisitos
+- Node.js
+- Docker
+- Supabase CLI
+- Expo CLI ou ambiente equivalente
+- npm ou pnpm
 
-- **Node.js**: 20.x ou superior (LTS recomendado)
-- **npm**: 10.x ou superior
-- **Docker Desktop**: 4.x ou superior (com Docker Engine ativo)
-- **Supabase CLI**: 2.x ou superior
-- **Android Studio + Emulador Android**: opcional (necessário para executar o app mobile no emulador)
+### Etapas gerais
+1. subir o Supabase local
+2. configurar variáveis de ambiente do backend (colocar dentro da pasta config) e mobile
+3. iniciar o backend NestJS
+4. iniciar o app mobile
+5. autenticar e validar o fluxo ponta a ponta
 
-> Dica: valide versões com `node -v`, `npm -v`, `docker --version` e `npx supabase@latest --version`.
+### Mapeamento de variáveis do Supabase
 
-### 2) Clonar o repositório e instalar dependências
+Para evitar ambiguidade entre os nomes exibidos pela Supabase CLI e os nomes usados no projeto, utilize o mapeamento abaixo:
 
-Na raiz do projeto, rode:
+| Origem (Supabase CLI) | Variável no projeto | Onde usar |
+| --- | --- | --- |
+| `anon key` / `ANON_KEY` | `SUPABASE_ANON_KEY` | backend |
+| `anon key` / `ANON_KEY` | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | mobile (Expo) |
 
-```bash
-git clone <url-do-repositorio>
-cd projeto-pdhc
-npm run setup
-```
+> Observação: durante o desenvolvimento mobile, a API deve ser consumida pelo IP da máquina hospedeira, e não por `localhost`, quando o app estiver rodando em dispositivo físico.
 
-O comando `npm run setup` instala as dependências de `backend/` e `mobile/`.
+### Scripts iniciais (raiz)
 
-### 3) Criar arquivos `.env` a partir dos exemplos
+- `npm run setup`: instala dependências de backend e mobile
+- `npm run dev` ou `npm run dev:all`: sobe Supabase local e roda backend + mobile juntos
+- `npm run dev:android`: sobe Supabase local e roda backend + mobile no Android Emulator
+- `npm run dev:services`: sobe Supabase local e roda apenas backend (ideal para Swagger)
+- `npm run dev:backend`: inicia backend em modo watch
+- `npm run dev:mobile`: inicia app mobile
+- `npm run dev:mobile:emulator`: inicia app mobile direto no Android Emulator
+- `npm run dev:mobile:android`: tenta abrir o app automaticamente no Android Emulator
+- `npm run supabase:start`: sobe os containers do Supabase local
+- `npm run supabase:status`: exibe status e credenciais locais do Supabase
+- `npm run supabase:stop`: para os containers do Supabase local
+- `npm run lint`: executa lint em backend e mobile
+- `npm run format`: aplica Prettier em backend e mobile
+- `npm run format:check`: valida formatação em backend e mobile
+- `npm run typecheck`: valida TypeScript em backend e mobile
+- `npm run test`: executa testes unitários do backend
+- `npm run test:e2e`: executa testes e2e do backend
 
-Crie os arquivos de ambiente com base nos exemplos:
+### Fluxo recomendado (Android Studio)
 
-- `backend/.env` a partir de `backend/.env.example`
-- `mobile/.env` a partir de `mobile/.env.example`
+1. `npm run dev:services`
+2. abrir Swagger no backend (`http://localhost:3000/docs`)
+3. em outro terminal, `npm run dev:mobile:emulator`
+4. com o emulador já aberto, pressione `a` no terminal do Expo (ou use `npm run dev:mobile:android`)
 
-Exemplo (Linux/macOS):
-
-```bash
-cp backend/.env.example backend/.env
-cp mobile/.env.example mobile/.env
-```
-
-### 4) Obter chaves do Supabase local e preencher no `.env`
-
-Com o Supabase local em execução, rode:
-
-```bash
-npm run supabase:status
-```
-
-Esse comando (equivalente a `supabase status`) mostra as credenciais locais, incluindo:
-
-- `anon key` → use em `SUPABASE_ANON_KEY` (backend) e `EXPO_PUBLIC_SUPABASE_ANON_KEY` (mobile)
-- `service_role key` → use em `SUPABASE_SERVICE_ROLE_KEY` (backend)
-- `JWT secret` → use em `SUPABASE_JWT_SECRET` (backend)
-
-Onde preencher:
-
-- **backend/.env**
-  - `SUPABASE_URL`
-  - `SUPABASE_ANON_KEY`
-  - `SUPABASE_SERVICE_ROLE_KEY`
-  - `SUPABASE_JWT_SECRET`
-  - `DATABASE_URL`
-- **mobile/.env**
-  - `EXPO_PUBLIC_API_URL`
-  - `EXPO_PUBLIC_SUPABASE_URL`
-  - `EXPO_PUBLIC_SUPABASE_ANON_KEY`
-
-> Para Android Emulator, prefira `10.0.2.2` em vez de `localhost` nas URLs do `mobile/.env`.
-
-### 5) Subir a stack local (`npm run dev` ou `npm run dev:all`)
-
-- `npm run dev`
-  - Atalho para `npm run dev:android`
-  - Sobe **Supabase local + backend + mobile**
-  - Inicia o mobile no modo indicado para emulador (`dev:mobile:emulator`)
-
-- `npm run dev:all`
-  - Sobe **Supabase local + backend + mobile**
-  - Inicia o mobile com `dev:mobile` (fluxo geral, útil para device físico/Expo)
-
-### 6) Validar backend e Swagger
-
-Com os serviços no ar, valide:
-
-- API backend: `http://localhost:3000/api`
-- Swagger: `http://localhost:3000/docs`
-
-### 7) Validar Supabase local (API, Studio e portas de DB)
-
-Com base em `supabase/config.toml`, valide os endpoints/portas principais:
-
-- **Supabase API**: `http://127.0.0.1:54321` (`[api].port = 54321`)
-- **Supabase Studio**: `http://127.0.0.1:54323` (`[studio].port = 54323`)
-- **Postgres local**: `127.0.0.1:54322` (`[db].port = 54322`)
-- **Shadow DB (migrations)**: `127.0.0.1:54320` (`[db].shadow_port = 54320`)
-
-Você também pode confirmar tudo com `npm run supabase:status`.
-
-### 8) Problemas comuns
-
-- **Porta ocupada**
-  - Sintoma: erro ao subir backend/Supabase/Expo.
-  - Ação: encerre processo na porta em conflito ou ajuste a porta configurada.
-
-- **Emulador sem acesso ao host**
-  - Sintoma: app abre, mas não conecta backend/Supabase.
-  - Ação: no Android Emulator, use `10.0.2.2` (não `localhost`) em `mobile/.env`.
-
-- **Token/chaves inválidas**
-  - Sintoma: 401/403 em rotas protegidas ou erro de autenticação.
-  - Ação: recopie `anon key`, `service_role key` e `JWT secret` do `npm run supabase:status` para os arquivos `.env` corretos.
-
-- **CORS bloqueando requisições**
-  - Sintoma: erro de CORS ao chamar API.
-  - Ação: confira `CORS_ORIGIN` no `backend/.env` e a origem real do app cliente.
-
-- **URL da API incorreta no mobile**
-  - Sintoma: timeout/Network Error no app.
-  - Ação: valide `EXPO_PUBLIC_API_URL` e `EXPO_PUBLIC_SUPABASE_URL` no `mobile/.env`.
-
-### 9) Checklist final de validação
-
-- [ ] backend responde em `http://localhost:3000/api`
-- [ ] app mobile abre normalmente
-- [ ] login funciona com Supabase local
-- [ ] rota protegida responde com token válido
+> No Android Emulator, o app usa `10.0.2.2` para acessar serviços do host (`backend` e `supabase`).
 
 ## Autor
 
