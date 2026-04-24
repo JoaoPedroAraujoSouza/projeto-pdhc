@@ -295,7 +295,7 @@ O projeto será organizado com:
 - integração com calendário
 - dashboard mais analítico
 
-## Como rodar localmente
+## Como rodar o projeto (passo a passo)
 
 ### Pré-requisitos
 - Node.js
