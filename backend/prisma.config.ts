@@ -2,10 +2,11 @@ import { config as loadEnv } from 'dotenv';
 import { existsSync } from 'node:fs';
 import { defineConfig, env } from 'prisma/config';
 
-if (existsSync('src/config/.env')) {
-  loadEnv({ path: 'src/config/.env' });
-} else {
-  loadEnv();
+const envCandidates = ['src/config/.env', '.env', '../.env'];
+const envPath = envCandidates.find((candidate) => existsSync(candidate));
+
+if (envPath) {
+  loadEnv({ path: envPath });
 }
 
 export default defineConfig({

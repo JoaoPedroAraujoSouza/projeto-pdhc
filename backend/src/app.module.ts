@@ -14,7 +14,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['src/config/.env', '.env'],
+      envFilePath: ['src/config/.env', '.env', '../.env'],
     }),
     PrismaModule,
     AuthModule,
