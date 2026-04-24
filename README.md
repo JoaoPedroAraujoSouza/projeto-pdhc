@@ -65,6 +65,26 @@ Equipe administrativa hospitalar responsável por cadastrar pacientes, manter pr
 - ESLint
 - Prettier
 
+## Setup local rápido
+
+1. `cp .env.example .env`
+2. `npm run setup`
+3. `npm run supabase:start`
+4. `npm run dev`
+
+### Variáveis Supabase (referência do `supabase status`)
+
+| Nome no `supabase status` | Nome no `.env` raiz | Serviço consumidor | Obrigatório? |
+| --- | --- | --- | --- |
+| API URL | `SUPABASE_URL` | backend e mobile | obrigatório |
+| anon key | `SUPABASE_ANON_KEY` | backend e mobile | obrigatório |
+| service_role key | `SUPABASE_SERVICE_ROLE_KEY` | backend | obrigatório |
+| JWT secret | `SUPABASE_JWT_SECRET` | backend | obrigatório |
+| DB URL | `DATABASE_URL` | backend | obrigatório |
+| _(não vem do Supabase status)_ | `EXPO_PUBLIC_APP_ENV` | mobile | opcional |
+
+> Observação: no mobile, use os equivalentes `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_ANON_KEY` no `.env` de `mobile/` para apontar para o host correto (emulador/dispositivo físico).
+
 ## Arquitetura
 
 ```text
