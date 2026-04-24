@@ -115,6 +115,7 @@ O projeto inclui dockerização completa dos serviços de app:
 - estratégia de testes: `docs/testing-strategy.md`
 - plano de entrega: `docs/delivery-plan.md`
 - guia interno de execução: `docs/internal-execution-guide.md`
+- guia completo de setup (clone até execução): `docs/guia-setup-completo.md`
 
 ## Regra de manutenção da documentação
 
