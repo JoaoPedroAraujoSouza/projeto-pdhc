@@ -72,4 +72,6 @@ No diretório `backend/` (se preferir execução direta):
 - validar conectividade com o banco do Supabase Cloud
 - em Docker/Windows, use `DATABASE_POOLER_URL` com pooler (`:6543`) para evitar erro de rede IPv6 no runtime
 - use `DATABASE_URL`/`DATABASE_DIRECT_URL` (porta `5432`) para `prisma db push` e migrations
+- se ocorrer `P1000`, valide usuário/host (pooler usa `postgres.<project-ref>`; conexão direta usa `postgres`)
+- se ocorrer `P1011` com `self-signed certificate in certificate chain`, valide cadeia TLS do ambiente; para diagnóstico em rede corporativa, teste `sslmode=no-verify`
 - rodar `npm --prefix backend run prisma:migrate:status`

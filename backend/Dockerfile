@@ -1,5 +1,7 @@
 FROM node:20-alpine
 
+RUN apk add --no-cache ca-certificates
+
 ARG DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 ENV DATABASE_URL=${DATABASE_URL}
 

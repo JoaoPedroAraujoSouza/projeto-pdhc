@@ -229,6 +229,10 @@ Se login falhar:
 - Confirme se a senha do banco está correta.
 - Se aparecer `ENETUNREACH` com IPv6 no Docker/Windows, configure `DATABASE_POOLER_URL` com pooler IPv4 (`*.pooler.supabase.com:6543`).
 - Mantenha `DATABASE_URL`/`DATABASE_DIRECT_URL` (porta `5432`) para `prisma db push` e migrations.
+- Se aparecer `P1000` (auth failed), valide usuário/host:
+  - pooler (`DATABASE_POOLER_URL`): usuário `postgres.<project-ref>`
+  - conexão direta (`DATABASE_URL`/`DATABASE_DIRECT_URL`): usuário `postgres`
+- Se aparecer `P1011` com `self-signed certificate in certificate chain`, confirme cadeia TLS do ambiente. Em rede corporativa/proxy, pode ser necessário testar temporariamente com `sslmode=no-verify` para diagnóstico.
 
 ### Mobile não acha backend
 
