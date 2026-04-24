@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { AppointmentStatus } from '@prisma/client';
 import { PrismaService } from '../../lib/prisma/prisma.service';
 
 @Injectable()
@@ -63,11 +64,28 @@ export class DashboardService {
       }
     }
 
-    // 2. Fetch upcoming appointments (ignoring cancelled/completed if we want,
-    // but the spec says "próximos agendamentos do dia", it's good to list all or at least scheduled/confirmed)
-    // Let's bring all appointments for today so the user sees the full agenda
+    // 2. Fetch only upcoming appointments for the selected day.
+    // For "today", this excludes earlier slots that already happened.
+    const now = new Date();
+    const isCurrentUtcDay =
+      baseDate.getUTCFullYear() === now.getUTCFullYear() &&
+      baseDate.getUTCMonth() === now.getUTCMonth() &&
+      baseDate.getUTCDate() === now.getUTCDate();
+
+    const upcomingStart = isCurrentUtcDay
+      ? new Date(Math.max(now.getTime(), startOfDay.getTime()))
+      : startOfDay;
+
     const upcomingAppointments = await this.prisma.appointment.findMany({
-      where: whereClause,
+      where: {
+        startAt: {
+          gte: upcomingStart,
+          lte: endOfDay,
+        },
+        status: {
+          in: [AppointmentStatus.SCHEDULED, AppointmentStatus.CONFIRMED],
+        },
+      },
       orderBy: {
         startAt: 'asc',
       },
