@@ -273,7 +273,7 @@ O projeto será organizado com:
 
 ### Etapas gerais
 1. subir o Supabase local
-2. configurar variáveis de ambiente do backend e mobile
+2. configurar variáveis de ambiente do backend (colocar dentro da pasta config) e mobile
 3. iniciar o backend NestJS
 4. iniciar o app mobile
 5. autenticar e validar o fluxo ponta a ponta
