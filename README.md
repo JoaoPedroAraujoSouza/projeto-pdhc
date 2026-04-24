@@ -298,6 +298,15 @@ O projeto será organizado com:
 4. iniciar o app mobile
 5. autenticar e validar o fluxo ponta a ponta
 
+### Mapeamento de variáveis do Supabase
+
+Para evitar ambiguidade entre os nomes exibidos pela Supabase CLI e os nomes usados no projeto, utilize o mapeamento abaixo:
+
+| Origem (Supabase CLI) | Variável no projeto | Onde usar |
+| --- | --- | --- |
+| `anon key` / `ANON_KEY` | `SUPABASE_ANON_KEY` | backend |
+| `anon key` / `ANON_KEY` | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | mobile (Expo) |
+
 > Observação: durante o desenvolvimento mobile, a API deve ser consumida pelo IP da máquina hospedeira, e não por `localhost`, quando o app estiver rodando em dispositivo físico.
 
 ### Scripts iniciais (raiz)
