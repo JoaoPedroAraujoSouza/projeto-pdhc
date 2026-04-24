@@ -160,7 +160,7 @@ PostgreSQL + Auth (Supabase local)
 ## Estrutura do repositório
 
 ```text
-hospagenda/
+projeto-pdhc/
   backend/
   mobile/
   docs/
@@ -186,12 +186,15 @@ backend/
 
 ```text
 mobile/
+  app/
+    _layout.tsx
+    index.tsx
+    auth/
+    (protected)/
   src/
-    screens/
     components/
     services/
     hooks/
-    navigation/
     types/
     utils/
     constants/
@@ -200,35 +203,45 @@ mobile/
 ## Endpoints do MVP
 
 ### Auth
-- `GET /auth/me`
+- `GET /api/auth/me`
 
 ### Specialties
-- `POST /specialties`
-- `GET /specialties`
+- `POST /api/specialties`
+- `GET /api/specialties`
 
 ### Professionals
-- `POST /professionals`
-- `GET /professionals`
-- `GET /professionals/:id`
-- `PATCH /professionals/:id`
+- `POST /api/professionals`
+- `GET /api/professionals`
+- `GET /api/professionals/:id`
+- `PATCH /api/professionals/:id`
 
 ### Patients
-- `POST /patients`
-- `GET /patients`
-- `GET /patients/:id`
-- `PATCH /patients/:id`
+- `POST /api/patients`
+- `GET /api/patients`
+- `GET /api/patients/:id`
+- `PATCH /api/patients/:id`
 
 ### Appointments
-- `POST /appointments`
-- `GET /appointments`
-- `GET /appointments/:id`
-- `PATCH /appointments/:id/confirm`
-- `PATCH /appointments/:id/reschedule`
-- `PATCH /appointments/:id/cancel`
-- `PATCH /appointments/:id/complete`
+- `POST /api/appointments`
+- `GET /api/appointments`
+- `GET /api/appointments/:id`
+- `PATCH /api/appointments/:id/confirm`
+- `PATCH /api/appointments/:id/reschedule`
+- `PATCH /api/appointments/:id/cancel`
+- `PATCH /api/appointments/:id/complete`
 
 ### Dashboard
-- `GET /dashboard/today`
+- `GET /api/dashboard/today`
+
+## Portas e URLs locais
+
+- backend NestJS: `http://127.0.0.1:3000` com prefixo global `api`
+- Supabase API local: `http://127.0.0.1:54321`
+- Postgres local (Supabase): `127.0.0.1:54322`
+
+## Nota de sincronização documental
+
+Sempre que houver mudança de rota, script ou variável de ambiente, atualize `README.md` e os arquivos em `docs/` no mesmo ciclo de alteração para manter contrato, arquitetura e setup alinhados.
 
 ## Fluxos principais
 
