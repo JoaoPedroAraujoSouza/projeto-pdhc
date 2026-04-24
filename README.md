@@ -262,52 +262,130 @@ O projeto será organizado com:
 - integração com calendário
 - dashboard mais analítico
 
-## Como rodar localmente
+## Como rodar o projeto (passo a passo)
 
-### Pré-requisitos
-- Node.js
-- Docker
-- Supabase CLI
-- Expo CLI ou ambiente equivalente
-- npm ou pnpm
+### 1) Pré-requisitos (versões mínimas)
 
-### Etapas gerais
-1. subir o Supabase local
-2. configurar variáveis de ambiente do backend (colocar dentro da pasta config) e mobile
-3. iniciar o backend NestJS
-4. iniciar o app mobile
-5. autenticar e validar o fluxo ponta a ponta
+- **Node.js**: 20.x ou superior (LTS recomendado)
+- **npm**: 10.x ou superior
+- **Docker Desktop**: 4.x ou superior (com Docker Engine ativo)
+- **Supabase CLI**: 2.x ou superior
+- **Android Studio + Emulador Android**: opcional (necessário para executar o app mobile no emulador)
 
-> Observação: durante o desenvolvimento mobile, a API deve ser consumida pelo IP da máquina hospedeira, e não por `localhost`, quando o app estiver rodando em dispositivo físico.
+> Dica: valide versões com `node -v`, `npm -v`, `docker --version` e `npx supabase@latest --version`.
 
-### Scripts iniciais (raiz)
+### 2) Clonar o repositório e instalar dependências
 
-- `npm run setup`: instala dependências de backend e mobile
-- `npm run dev` ou `npm run dev:all`: sobe Supabase local e roda backend + mobile juntos
-- `npm run dev:android`: sobe Supabase local e roda backend + mobile no Android Emulator
-- `npm run dev:services`: sobe Supabase local e roda apenas backend (ideal para Swagger)
-- `npm run dev:backend`: inicia backend em modo watch
-- `npm run dev:mobile`: inicia app mobile
-- `npm run dev:mobile:emulator`: inicia app mobile direto no Android Emulator
-- `npm run dev:mobile:android`: tenta abrir o app automaticamente no Android Emulator
-- `npm run supabase:start`: sobe os containers do Supabase local
-- `npm run supabase:status`: exibe status e credenciais locais do Supabase
-- `npm run supabase:stop`: para os containers do Supabase local
-- `npm run lint`: executa lint em backend e mobile
-- `npm run format`: aplica Prettier em backend e mobile
-- `npm run format:check`: valida formatação em backend e mobile
-- `npm run typecheck`: valida TypeScript em backend e mobile
-- `npm run test`: executa testes unitários do backend
-- `npm run test:e2e`: executa testes e2e do backend
+Na raiz do projeto, rode:
 
-### Fluxo recomendado (Android Studio)
+```bash
+git clone <url-do-repositorio>
+cd projeto-pdhc
+npm run setup
+```
 
-1. `npm run dev:services`
-2. abrir Swagger no backend (`http://localhost:3000/docs`)
-3. em outro terminal, `npm run dev:mobile:emulator`
-4. com o emulador já aberto, pressione `a` no terminal do Expo (ou use `npm run dev:mobile:android`)
+O comando `npm run setup` instala as dependências de `backend/` e `mobile/`.
 
-> No Android Emulator, o app usa `10.0.2.2` para acessar serviços do host (`backend` e `supabase`).
+### 3) Criar arquivos `.env` a partir dos exemplos
+
+Crie os arquivos de ambiente com base nos exemplos:
+
+- `backend/.env` a partir de `backend/.env.example`
+- `mobile/.env` a partir de `mobile/.env.example`
+
+Exemplo (Linux/macOS):
+
+```bash
+cp backend/.env.example backend/.env
+cp mobile/.env.example mobile/.env
+```
+
+### 4) Obter chaves do Supabase local e preencher no `.env`
+
+Com o Supabase local em execução, rode:
+
+```bash
+npm run supabase:status
+```
+
+Esse comando (equivalente a `supabase status`) mostra as credenciais locais, incluindo:
+
+- `anon key` → use em `SUPABASE_ANON_KEY` (backend) e `EXPO_PUBLIC_SUPABASE_ANON_KEY` (mobile)
+- `service_role key` → use em `SUPABASE_SERVICE_ROLE_KEY` (backend)
+- `JWT secret` → use em `SUPABASE_JWT_SECRET` (backend)
+
+Onde preencher:
+
+- **backend/.env**
+  - `SUPABASE_URL`
+  - `SUPABASE_ANON_KEY`
+  - `SUPABASE_SERVICE_ROLE_KEY`
+  - `SUPABASE_JWT_SECRET`
+  - `DATABASE_URL`
+- **mobile/.env**
+  - `EXPO_PUBLIC_API_URL`
+  - `EXPO_PUBLIC_SUPABASE_URL`
+  - `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+
+> Para Android Emulator, prefira `10.0.2.2` em vez de `localhost` nas URLs do `mobile/.env`.
+
+### 5) Subir a stack local (`npm run dev` ou `npm run dev:all`)
+
+- `npm run dev`
+  - Atalho para `npm run dev:android`
+  - Sobe **Supabase local + backend + mobile**
+  - Inicia o mobile no modo indicado para emulador (`dev:mobile:emulator`)
+
+- `npm run dev:all`
+  - Sobe **Supabase local + backend + mobile**
+  - Inicia o mobile com `dev:mobile` (fluxo geral, útil para device físico/Expo)
+
+### 6) Validar backend e Swagger
+
+Com os serviços no ar, valide:
+
+- API backend: `http://localhost:3000/api`
+- Swagger: `http://localhost:3000/docs`
+
+### 7) Validar Supabase local (API, Studio e portas de DB)
+
+Com base em `supabase/config.toml`, valide os endpoints/portas principais:
+
+- **Supabase API**: `http://127.0.0.1:54321` (`[api].port = 54321`)
+- **Supabase Studio**: `http://127.0.0.1:54323` (`[studio].port = 54323`)
+- **Postgres local**: `127.0.0.1:54322` (`[db].port = 54322`)
+- **Shadow DB (migrations)**: `127.0.0.1:54320` (`[db].shadow_port = 54320`)
+
+Você também pode confirmar tudo com `npm run supabase:status`.
+
+### 8) Problemas comuns
+
+- **Porta ocupada**
+  - Sintoma: erro ao subir backend/Supabase/Expo.
+  - Ação: encerre processo na porta em conflito ou ajuste a porta configurada.
+
+- **Emulador sem acesso ao host**
+  - Sintoma: app abre, mas não conecta backend/Supabase.
+  - Ação: no Android Emulator, use `10.0.2.2` (não `localhost`) em `mobile/.env`.
+
+- **Token/chaves inválidas**
+  - Sintoma: 401/403 em rotas protegidas ou erro de autenticação.
+  - Ação: recopie `anon key`, `service_role key` e `JWT secret` do `npm run supabase:status` para os arquivos `.env` corretos.
+
+- **CORS bloqueando requisições**
+  - Sintoma: erro de CORS ao chamar API.
+  - Ação: confira `CORS_ORIGIN` no `backend/.env` e a origem real do app cliente.
+
+- **URL da API incorreta no mobile**
+  - Sintoma: timeout/Network Error no app.
+  - Ação: valide `EXPO_PUBLIC_API_URL` e `EXPO_PUBLIC_SUPABASE_URL` no `mobile/.env`.
+
+### 9) Checklist final de validação
+
+- [ ] backend responde em `http://localhost:3000/api`
+- [ ] app mobile abre normalmente
+- [ ] login funciona com Supabase local
+- [ ] rota protegida responde com token válido
 
 ## Autor
 
