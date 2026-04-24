@@ -26,6 +26,7 @@ cp .env.example .env
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_JWT_SECRET`
 - `DATABASE_URL`
+- `DATABASE_DIRECT_URL` (recomendado para `prisma db push`/migrations)
 
 ## Endereços locais
 
@@ -68,5 +69,6 @@ No diretório `backend/` (se preferir execução direta):
 ### erro de banco (Prisma)
 
 - validar conectividade com o banco do Supabase Cloud
-- validar `DATABASE_URL` com `sslmode=require`
+- em Docker/Windows, prefira `DATABASE_URL` com pooler (`:6543`) para evitar erro de rede IPv6
+- use `DATABASE_DIRECT_URL` (porta `5432`) para `prisma db push` e migrations
 - rodar `npm --prefix backend run prisma:migrate:status`
