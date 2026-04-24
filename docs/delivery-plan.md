@@ -38,7 +38,7 @@ A entrega será conduzida em fases curtas e orientadas a risco. O fluxo técnico
 
 ### Objetivos
 
-- subir Supabase local
+- configurar credenciais do Supabase Cloud
 - configurar backend NestJS
 - configurar app React Native
 - conectar autenticação do app ao Supabase
@@ -124,7 +124,7 @@ A entrega será conduzida em fases curtas e orientadas a risco. O fluxo técnico
 - docs base
 - GitHub Projects
 - setup inicial backend/mobile
-- Supabase local
+- Supabase Cloud
 
 ### Dia 2
 
@@ -220,7 +220,6 @@ No diretório raiz do projeto:
 ```bash
 cp .env.example .env
 npm run setup
-npm run supabase:start
 npm run dev:backend
 ```
 

@@ -4,19 +4,23 @@ on:
   push:
     paths:
       - "backend/**"
+      - "docker-compose.ci.yml"
       - ".github/workflows/backend-ci.yml"
   pull_request:
     paths:
       - "backend/**"
+      - "docker-compose.ci.yml"
       - ".github/workflows/backend-ci.yml"
   workflow_dispatch:
+
+env:
+  DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
+  SUPABASE_URL: "https://example.supabase.co"
+  SUPABASE_ANON_KEY: "ci-anon-key"
 
 concurrency:
   group: backend-ci-${{ github.ref }}
   cancel-in-progress: true
-
-env:
-  DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
 
 jobs:
   quality:
@@ -63,21 +67,6 @@ jobs:
       run:
         working-directory: backend
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -92,6 +81,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Start PostgreSQL via Docker Compose
+        if: matrix.suite == 'e2e'
+        run: docker compose -f docker-compose.ci.yml up -d postgres
+
       - name: Setup Database
         if: matrix.suite == 'e2e'
         run: npx prisma db push --accept-data-loss
@@ -103,3 +96,7 @@ jobs:
       - name: Run e2e tests
         if: matrix.suite == 'e2e'
         run: npm run test:e2e
+
+      - name: Stop Docker Compose services
+        if: always() && matrix.suite == 'e2e'
+        run: docker compose -f docker-compose.ci.yml down -v

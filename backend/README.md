@@ -6,7 +6,7 @@ API do projeto PDHC responsável por autenticação (validação de token), regr
 
 - Node.js LTS
 - npm
-- Supabase local ativo (`npx supabase start`)
+- Acesso ao projeto Supabase Cloud (Auth + Postgres)
 
 ## Configuração de ambiente
 
@@ -53,7 +53,7 @@ No diretório `backend/` (se preferir execução direta):
 
 ## Fluxo recomendado
 
-1. `npm run supabase:start`
+1. Configure `.env` com credenciais do Supabase Cloud
 2. `npm run dev:backend`
 3. acessar `http://localhost:3000/docs`
 
@@ -66,6 +66,6 @@ No diretório `backend/` (se preferir execução direta):
 
 ### erro de banco (Prisma)
 
-- confirmar Supabase ativo
-- validar `DATABASE_URL` com porta `54322`
+- validar conectividade com o banco do Supabase Cloud
+- validar `DATABASE_URL` com `sslmode=require`
 - rodar `npm --prefix backend run prisma:migrate:status`
