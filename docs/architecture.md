@@ -1,74 +1,44 @@
 # Architecture
 
 ## Visão geral
-O HospAgenda será estruturado como um monorepo contendo:
 
-- aplicação mobile em React Native
+O projeto está organizado em monorepo com três blocos principais:
+
+- app mobile em React Native (Expo Router)
 - API backend em NestJS
-- autenticação e banco de dados via Supabase em ambiente local
-- documentação técnica e funcional em uma pasta dedicada
+- autenticação + banco local via Supabase
 
-A proposta é manter um ambiente simples, reproduzível e adequado ao prazo do MVP, sem abrir mão de boas práticas de organização.
+A integração segue o fluxo **mobile → backend → banco/auth**, com o token de acesso emitido pelo Supabase e validado no backend.
 
 ## Objetivos arquiteturais
-A arquitetura foi definida para atender aos seguintes objetivos:
 
-- separar autenticação de regras de negócio
-- manter o backend como núcleo do domínio da aplicação
-- facilitar manutenção e evolução futura
-- manter baixo acoplamento entre camadas
-- favorecer testabilidade
-- preservar simplicidade compatível com o prazo
+- manter o backend como núcleo das regras de negócio
+- separar autenticação da lógica de domínio
+- preservar baixo acoplamento entre camadas
+- facilitar manutenção e evolução do MVP
+- manter setup local reproduzível e simples
 
-## Estrutura do sistema
-### Mobile
-Responsável por:
+## Estrutura real do monorepo
 
-- autenticação do usuário via Supabase Auth
-- navegação entre telas
-- formulários e fluxos de cadastro
-- consumo da API NestJS
-- exibição de dashboard e listagens
-
-### Backend
-Responsável por:
-
-- validação do token de autenticação
-- proteção de rotas
-- regras de negócio do domínio
-- validação dos dados recebidos
-- operações de leitura e escrita no banco
-- documentação da API
-
-### Supabase
-Responsável por:
-
-- autenticação local do usuário
-- persistência no banco PostgreSQL local
-
-## Decisão sobre autenticação
-A autenticação será feita pelo Supabase Auth. O aplicativo mobile realizará login e cadastro diretamente no Supabase, obtendo um token de acesso que será enviado ao backend nas requisições protegidas.
-
-O backend NestJS não emitirá tokens próprios neste MVP. Ele será responsável por validar o token recebido e identificar o usuário autenticado.
-
-### Motivação
-Essa decisão reduz a complexidade inicial do projeto, acelera a implementação do fluxo de acesso e permite concentrar esforço no domínio hospitalar, sem perder demonstração de integração e segurança básica.
-
-## Estrutura do monorepo
 ```text
 projeto-pdhc/
   backend/
   mobile/
   docs/
-  .github/
+  scripts/
 ```
 
-## Estrutura do backend
+## Estrutura real do backend
+
 ```text
 backend/
+  prisma/
   src/
     main.ts
     app.module.ts
+    health/
+    lib/
+      prisma/
     modules/
       auth/
       specialties/
@@ -76,17 +46,20 @@ backend/
       patients/
       appointments/
       dashboard/
-    common/
-      decorators/
-      dto/
-      enums/
-      guards/
-      filters/
-      interceptors/
-      utils/
+  test/
 ```
 
-## Estrutura do mobile
+### Responsabilidades do backend
+
+- validação do token Supabase (`SupabaseAuthGuard`)
+- exposição de API REST em `/api`
+- validação de entrada com DTOs + `ValidationPipe`
+- aplicação de regras de negócio (conflito de horário, status, datas)
+- persistência com Prisma/PostgreSQL
+- documentação automática com Swagger em `/docs`
+
+## Estrutura real do mobile
+
 ```text
 mobile/
   app/
@@ -96,121 +69,59 @@ mobile/
     (protected)/
   src/
     components/
-    services/
     hooks/
+    lib/
+    providers/
+    schemas/
+    services/
+    styles/
     types/
-    utils/
-    constants/
 ```
 
-## Portas e endpoints locais
-- backend NestJS: `http://127.0.0.1:3000`
-- prefixo global de rotas do backend: `/api`
+### Responsabilidades do mobile
+
+- autenticação do usuário no Supabase
+- gerenciamento de sessão em contexto (`AuthProvider`)
+- consumo da API do backend com `axios`
+- fluxo administrativo de cadastros e consultas
+- navegação protegida por rotas autenticadas
+
+## Contratos e portas locais
+
+- Backend: `http://127.0.0.1:3000`
+- Prefixo global de API: `/api`
+- Swagger: `http://127.0.0.1:3000/docs`
 - Supabase API local: `http://127.0.0.1:54321`
 - Postgres local (Supabase): `127.0.0.1:54322`
 
-Exemplo completo de endpoint protegido no ambiente local: `http://127.0.0.1:3000/api/auth/me`.
+## Modelo de autenticação
 
-## Módulos do backend
-### Auth
-Módulo responsável por:
-
-- validar o token recebido do Supabase
-- proteger rotas autenticadas
-- disponibilizar dados do usuário autenticado para os demais módulos
-
-### Specialties
-Módulo responsável por cadastro e listagem de especialidades.
-
-### Professionals
-Módulo responsável por cadastro, edição, visualização e listagem de profissionais.
-
-### Patients
-Módulo responsável por cadastro, edição, visualização e listagem de pacientes.
-
-### Appointments
-Módulo principal do domínio. Responsável por:
-
-- criação de consultas
-- validação de conflito de horário
-- confirmação
-- remarcação
-- cancelamento
-- conclusão
-- filtros de listagem
-
-### Dashboard
-Módulo responsável por consolidar dados do dia para exibição resumida no app.
-
-## Entidades principais
-### Specialty
-Representa uma especialidade médica cadastrada no sistema.
-
-### Professional
-Representa um profissional de saúde vinculado a uma única especialidade.
-
-### Patient
-Representa um paciente atendido pelo sistema.
-
-### Appointment
-Representa um agendamento de consulta, incluindo vínculo com paciente, profissional, especialidade, horário e status.
+1. app realiza sign in / sign up no Supabase
+2. Supabase devolve `access_token`
+3. app envia `Authorization: Bearer <token>` para a API
+4. backend valida o token e injeta o usuário autenticado na request
+5. módulos de domínio executam rotas protegidas
 
 ## Modelo de agendamento
-O sistema adotará uma abordagem simplificada para o tempo da consulta:
 
-- a consulta possui apenas `startAt`
-- a duração é implícita e fixa em 30 minutos
-- o `endAt` é derivado por cálculo quando necessário
+- cada consulta possui `startAt`
+- duração é implícita (30 minutos)
+- `specialtyId` do agendamento é derivado do profissional
+- status possíveis: `SCHEDULED`, `CONFIRMED`, `CANCELLED`, `COMPLETED`
 
-### Motivação
-Essa decisão reduz complexidade em:
+## Regras centrais de domínio
 
-- modelagem de dados
-- formulários
-- validação de conflito
-- testes
+- não criar/remarcar consulta no passado
+- não permitir conflito de horário por profissional
+- profissional deve ter especialidade válida
+- paciente/profissional devem existir para criar consulta
+- cancelamento preserva histórico (sem delete físico)
+- conclusão só para consultas ativas
 
-## Status de consulta
-Os status do agendamento serão:
+## Observação de sincronização documental
 
-- `SCHEDULED`
-- `CONFIRMED`
-- `CANCELLED`
-- `COMPLETED`
+Mudanças em rotas, payloads, variáveis de ambiente ou scripts devem atualizar em conjunto:
 
-## Fluxo de autenticação
-1. usuário realiza login ou cadastro no app
-2. Supabase Auth autentica o usuário
-3. o app recebe a sessão e o access token
-4. o token é enviado no header Authorization para a API
-5. o backend valida o token
-6. a rota protegida executa normalmente
-
-## Fluxo de criação de agendamento
-1. usuário autenticado seleciona paciente
-2. usuário seleciona profissional
-3. sistema considera a especialidade vinculada ao profissional
-4. usuário informa data/hora de início
-5. backend valida se a data é futura
-6. backend valida se não há conflito para o profissional
-7. backend cria o agendamento com status inicial
-
-## Princípios adotados
-- controllers finos
-- regras de negócio centralizadas em services
-- validação de entrada com DTOs
-- separação entre infraestrutura e domínio
-- documentação próxima da implementação
-- escopo controlado para preservar qualidade de entrega
-
-## Trade-offs assumidos
-- sem múltiplos perfis de usuário no MVP
-- sem delete físico
-- sem disponibilidade médica avançada
-- sem tempo real
-- sem múltiplas especialidades por profissional
-
-Esses trade-offs são intencionais e visam maximizar a qualidade do núcleo do sistema dentro do prazo disponível.
-
-## Nota de sincronização documental
-Qualquer alteração de rota, script ou variável de ambiente deve ser acompanhada de atualização imediata da documentação (`README.md`, `docs/architecture.md`, `docs/api-contract.md` e demais docs impactados).
+- `README.md`
+- `docs/api-contract.md`
+- `backend/README.md` e/ou `mobile/README.md`
