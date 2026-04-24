@@ -47,6 +47,7 @@ No diretório `backend/` (se preferir execução direta):
 - `npm run build`
 - `npm run test`
 - `npm run test:e2e`
+- `npm run prisma:db:push`
 - `npm run prisma:migrate:status`
 - `npm run prisma:migrate:dev`
 - `npm run prisma:studio`

@@ -150,7 +150,15 @@ Com `DATABASE_URL` configurada:
 
 ```bash
 DATABASE_URL="$DATABASE_URL" npm --prefix backend run prisma:generate
-DATABASE_URL="$DATABASE_URL" npx --prefix backend prisma db push
+DATABASE_URL="$DATABASE_URL" npm --prefix backend run prisma:db:push
+```
+
+### PowerShell (Windows)
+
+```powershell
+$env:DATABASE_URL="postgresql://postgres:<senha>@db.<project-ref>.supabase.co:5432/postgres?sslmode=require"
+npm --prefix backend run prisma:generate
+npm --prefix backend run prisma:db:push
 ```
 
 ---
@@ -241,7 +249,7 @@ cp .env.example .env
 npm run setup
 npm run sync:mobile-env
 DATABASE_URL="$DATABASE_URL" npm --prefix backend run prisma:generate
-DATABASE_URL="$DATABASE_URL" npx --prefix backend prisma db push
+DATABASE_URL="$DATABASE_URL" npm --prefix backend run prisma:db:push
 npm run dev
 ```
 
