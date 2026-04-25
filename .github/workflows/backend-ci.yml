@@ -89,7 +89,7 @@ jobs:
 
       - name: Start PostgreSQL via Docker Compose
         if: matrix.suite == 'e2e'
-        run: docker compose -f docker-compose.ci.yml up -d postgres
+        run: docker compose -f ../docker-compose.ci.yml up -d postgres
 
       - name: Setup Database
         if: matrix.suite == 'e2e'
@@ -105,4 +105,4 @@ jobs:
 
       - name: Stop Docker Compose services
         if: always() && matrix.suite == 'e2e'
-        run: docker compose -f docker-compose.ci.yml down -v
+        run: docker compose -f ../docker-compose.ci.yml down -v
