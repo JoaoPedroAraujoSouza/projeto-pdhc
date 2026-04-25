@@ -6,6 +6,7 @@ import { PrismaService } from '../src/lib/prisma/prisma.service';
 import { SupabaseAuthService } from '../src/modules/auth/services/supabase-auth.service';
 import { setupE2eApp } from './utils/e2e-setup';
 import { randomUUID } from 'crypto';
+import { AppointmentStatus } from '@prisma/client';
 
 describe('PatientsController (e2e)', () => {
   let app: INestApplication;
@@ -197,6 +198,74 @@ describe('PatientsController (e2e)', () => {
 
       // Cleanup
       await prisma.patient.delete({ where: { id: patient.id } });
+    });
+  });
+
+  describe('DELETE /api/patients/:id', () => {
+    it('deletes patient when there is no scheduled or confirmed appointment', async () => {
+      const patient = await prisma.patient.create({
+        data: {
+          fullName: 'Delete Me',
+          cpf: Math.random().toString().slice(2, 13),
+          birthDate: new Date('1992-06-10'),
+          phone: '11911111111',
+        },
+      });
+
+      await request(app.getHttpServer())
+        .delete(`/api/patients/${patient.id}`)
+        .set('Authorization', validToken)
+        .expect(204);
+
+      const deletedPatient = await prisma.patient.findUnique({
+        where: { id: patient.id },
+      });
+      expect(deletedPatient).toBeNull();
+    });
+
+    it('returns 422 when patient has appointment with status scheduled', async () => {
+      const specialty = await prisma.specialty.create({
+        data: { name: `E2E Del ${randomUUID().slice(0, 8)}` },
+      });
+      const professional = await prisma.professional.create({
+        data: {
+          fullName: 'E2E Del Professional',
+          specialtyId: specialty.id,
+        },
+      });
+      const patient = await prisma.patient.create({
+        data: {
+          fullName: 'Locked Patient',
+          cpf: Math.random().toString().slice(2, 13),
+          birthDate: new Date('1991-04-01'),
+          phone: '11922222222',
+        },
+      });
+      const appointment = await prisma.appointment.create({
+        data: {
+          patientId: patient.id,
+          professionalId: professional.id,
+          specialtyId: specialty.id,
+          startAt: new Date(Date.now() + 2 * 60 * 60 * 1000),
+          status: AppointmentStatus.SCHEDULED,
+        },
+      });
+
+      await request(app.getHttpServer())
+        .delete(`/api/patients/${patient.id}`)
+        .set('Authorization', validToken)
+        .expect(422)
+        .expect((res) => {
+          const body = res.body as { message: string };
+          expect(body.message).toBe(
+            'Não é possível excluir o paciente pois ele possui consulta agendada ou confirmada.',
+          );
+        });
+
+      await prisma.appointment.delete({ where: { id: appointment.id } });
+      await prisma.patient.delete({ where: { id: patient.id } });
+      await prisma.professional.delete({ where: { id: professional.id } });
+      await prisma.specialty.delete({ where: { id: specialty.id } });
     });
   });
 });

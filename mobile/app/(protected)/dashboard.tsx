@@ -18,6 +18,7 @@ import { getDashboardToday } from '@/services/dashboard/get-dashboard-today';
 import type { DashboardTodayResponse } from '@/types/dashboard';
 import { AppointmentListItem } from '@/components/appointments/AppointmentListItem';
 import { AppointmentsEmptyState } from '@/components/appointments/AppointmentsEmptyState';
+import { ConfirmActionModal } from '@/components/ui/ConfirmActionModal';
 
 export default function DashboardScreen() {
   const { user, signOut } = useAuth();
@@ -25,6 +26,8 @@ export default function DashboardScreen() {
   const [data, setData] = useState<DashboardTodayResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -47,6 +50,7 @@ export default function DashboardScreen() {
 
   async function handleSignOut() {
     try {
+      setIsSigningOut(true);
       await signOut();
     } catch {
       Toast.show({
@@ -54,6 +58,9 @@ export default function DashboardScreen() {
         text1: 'Erro ao sair',
         text2: 'Não foi possível sair da conta agora.',
       });
+    } finally {
+      setIsSigningOut(false);
+      setIsLogoutModalVisible(false);
     }
   }
 
@@ -108,7 +115,7 @@ export default function DashboardScreen() {
           </View>
           <TouchableOpacity
             style={styles.logoutButton}
-            onPress={handleSignOut}
+            onPress={() => setIsLogoutModalVisible(true)}
             activeOpacity={0.8}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
@@ -229,6 +236,24 @@ export default function DashboardScreen() {
           </View>
         </View>
       </ScrollView>
+
+      <ConfirmActionModal
+        visible={isLogoutModalVisible}
+        title="Sair da conta"
+        message="Tem certeza de que deseja sair da sua conta?"
+        cancelLabel="Cancelar"
+        confirmLabel="Sair"
+        isLoading={isSigningOut}
+        onCancel={() => {
+          if (isSigningOut) {
+            return;
+          }
+          setIsLogoutModalVisible(false);
+        }}
+        onConfirm={() => {
+          void handleSignOut();
+        }}
+      />
 
       <TouchableOpacity
         style={styles.fab}

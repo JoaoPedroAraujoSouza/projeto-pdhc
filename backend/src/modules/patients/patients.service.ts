@@ -2,7 +2,9 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
+import { AppointmentStatus } from '@prisma/client';
 import { PrismaService } from '../../lib/prisma/prisma.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
@@ -59,6 +61,30 @@ export class PatientsService {
         }),
         ...(dto.phone !== undefined && { phone: dto.phone }),
       },
+    });
+  }
+
+  async remove(id: string) {
+    await this.findOne(id);
+
+    const activeAppointment = await this.prisma.appointment.findFirst({
+      where: {
+        patientId: id,
+        status: {
+          in: [AppointmentStatus.SCHEDULED, AppointmentStatus.CONFIRMED],
+        },
+      },
+      select: { id: true },
+    });
+
+    if (activeAppointment) {
+      throw new UnprocessableEntityException(
+        'Não é possível excluir o paciente pois ele possui consulta agendada ou confirmada.',
+      );
+    }
+
+    await this.prisma.patient.delete({
+      where: { id },
     });
   }
 
