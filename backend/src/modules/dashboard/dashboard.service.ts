@@ -1,35 +1,38 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../lib/prisma/prisma.service';
 
+const BRASILIA_TIME_ZONE = 'America/Sao_Paulo';
+const BRASILIA_UTC_OFFSET = '-03:00';
+
 @Injectable()
 export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private getTodayDateStringInBrasilia(): string {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: BRASILIA_TIME_ZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+  }
+
   async getTodayMetrics(dateString?: string) {
-    // If dateString is not provided, fallback to current UTC date.
-    // It's highly recommended for clients to pass the dateString in YYYY-MM-DD format.
-    let baseDate: Date;
-    if (dateString) {
-      // Validate format YYYY-MM-DD
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-        throw new BadRequestException(
-          'Formato de data inválido. Use YYYY-MM-DD.',
-        );
-      }
-      // Create date strictly based on the string (UTC boundaries)
-      baseDate = new Date(`${dateString}T00:00:00.000Z`);
-    } else {
-      const now = new Date();
-      baseDate = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+    const targetDateString = dateString ?? this.getTodayDateStringInBrasilia();
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(targetDateString)) {
+      throw new BadRequestException(
+        'Formato de data inválido. Use YYYY-MM-DD.',
       );
     }
 
-    // Set time boundaries based on the normalized baseDate
-    const startOfDay = new Date(baseDate);
-
-    const endOfDay = new Date(baseDate);
-    endOfDay.setUTCHours(23, 59, 59, 999);
+    // Boundaries for the calendar day in Brasília time (UTC-03:00).
+    const startOfDay = new Date(
+      `${targetDateString}T00:00:00.000${BRASILIA_UTC_OFFSET}`,
+    );
+    const endOfDay = new Date(
+      `${targetDateString}T23:59:59.999${BRASILIA_UTC_OFFSET}`,
+    );
 
     const whereClause = {
       startAt: {

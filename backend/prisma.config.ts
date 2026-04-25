@@ -10,6 +10,9 @@ if (envPath) {
 }
 
 const directUrl = process.env.DATABASE_DIRECT_URL;
+const databaseUrl =
+  process.env.DATABASE_URL ??
+  'postgresql://postgres:postgres@localhost:5432/postgres';
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
@@ -17,7 +20,7 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    url: env('DATABASE_URL'),
+    url: databaseUrl,
     ...(directUrl ? { directUrl } : {}),
   },
 });

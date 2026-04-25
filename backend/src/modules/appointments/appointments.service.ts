@@ -12,6 +12,7 @@ import { ListAppointmentsQueryDto } from './dto/list-appointments-query.dto';
 import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto';
 
 const SLOT_DURATION_MINUTES = 30;
+const BRASILIA_UTC_OFFSET = '-03:00';
 
 const appointmentInclude = {
   patient: {
@@ -90,8 +91,12 @@ export class AppointmentsService {
     }
 
     if (query.date) {
-      const dayStart = new Date(`${query.date}T00:00:00.000Z`);
-      const dayEnd = new Date(`${query.date}T23:59:59.999Z`);
+      const dayStart = new Date(
+        `${query.date}T00:00:00.000${BRASILIA_UTC_OFFSET}`,
+      );
+      const dayEnd = new Date(
+        `${query.date}T23:59:59.999${BRASILIA_UTC_OFFSET}`,
+      );
       where.startAt = { gte: dayStart, lte: dayEnd };
     }
 
