@@ -21,7 +21,9 @@ export class DashboardService {
     const targetDateString = dateString ?? this.getTodayDateStringInBrasilia();
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(targetDateString)) {
-      throw new BadRequestException('Formato de data inválido. Use YYYY-MM-DD.');
+      throw new BadRequestException(
+        'Formato de data inválido. Use YYYY-MM-DD.',
+      );
     }
 
     // Boundaries for the calendar day in Brasília time (UTC-03:00).
