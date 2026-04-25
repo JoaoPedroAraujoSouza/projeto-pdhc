@@ -110,7 +110,6 @@ export default function PatientsScreen() {
     try {
       setIsDeletingPatient(true);
       await deletePatient(patientToDelete.id);
-      setPatientToDelete(null);
 
       Toast.show({
         type: 'success',
@@ -121,8 +120,8 @@ export default function PatientsScreen() {
       setPatients((current) =>
         current.filter((item) => item.id !== patientToDelete.id),
       );
-    } catch (error) {
       setPatientToDelete(null);
+    } catch (error) {
       Toast.show({
         type: 'error',
         text1: 'Não foi possível excluir',
