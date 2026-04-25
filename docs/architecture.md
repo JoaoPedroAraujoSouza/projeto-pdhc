@@ -6,7 +6,7 @@ O projeto está organizado em monorepo com três blocos principais:
 
 - app mobile em React Native (Expo Router)
 - API backend em NestJS
-- autenticação + banco local via Supabase
+- autenticação + banco via Supabase Cloud
 
 A integração segue o fluxo **mobile → backend → banco/auth**, com o token de acesso emitido pelo Supabase e validado no backend.
 
@@ -91,8 +91,8 @@ mobile/
 - Backend: `http://127.0.0.1:3000`
 - Prefixo global de API: `/api`
 - Swagger: `http://127.0.0.1:3000/docs`
-- Supabase API local: `http://127.0.0.1:54321`
-- Postgres local (Supabase): `127.0.0.1:54322`
+- Supabase API (cloud): `https://<project-ref>.supabase.co`
+- Postgres (cloud): `db.<project-ref>.supabase.co:5432` (SSL)
 
 ## Modelo de autenticação
 

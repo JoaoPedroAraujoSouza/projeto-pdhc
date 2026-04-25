@@ -9,6 +9,8 @@ if (envPath) {
   loadEnv({ path: envPath });
 }
 
+const directUrl = process.env.DATABASE_DIRECT_URL;
+
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
@@ -16,5 +18,6 @@ export default defineConfig({
   },
   datasource: {
     url: env('DATABASE_URL'),
+    ...(directUrl ? { directUrl } : {}),
   },
 });

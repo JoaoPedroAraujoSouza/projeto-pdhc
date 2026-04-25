@@ -1,6 +1,6 @@
 # Projeto PDHC
 
-Aplicação mobile de agendamento hospitalar simplificado para uso administrativo, com backend em NestJS, autenticação via Supabase local e fluxo completo de cadastros + consultas.
+Aplicação mobile de agendamento hospitalar simplificado para uso administrativo, com backend em NestJS, autenticação via Supabase Cloud e fluxo completo de cadastros + consultas.
 
 ## Status atual do projeto
 
@@ -17,7 +17,7 @@ O MVP está implementado com:
 
 - **Mobile:** React Native + Expo Router + TypeScript
 - **Backend:** NestJS + Prisma + PostgreSQL
-- **Auth/DB local:** Supabase CLI (Auth + Postgres)
+- **Auth/DB:** Supabase Cloud (Auth + Postgres)
 - **Qualidade:** ESLint, Prettier, Jest, Swagger/OpenAPI
 
 ## Estrutura do monorepo
@@ -50,7 +50,7 @@ npm run setup
 npm run dev
 ```
 
-> `npm run dev` executa: Supabase local + backend + mobile (porta 8082), com sync automático do `mobile/.env`.
+> `npm run dev` executa backend + mobile (porta 8082), com sync automático do `mobile/.env`.
 
 ## Variáveis de ambiente (fonte única)
 
@@ -64,7 +64,9 @@ A **fonte de verdade** é o arquivo `.env` na raiz. O script `npm run sync:mobil
 | `SUPABASE_ANON_KEY`             | Backend e mobile                                    |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Backend                                             |
 | `SUPABASE_JWT_SECRET`           | Backend                                             |
-| `DATABASE_URL`                  | Prisma / backend                                    |
+| `DATABASE_POOLER_URL`           | Backend runtime no Docker/Windows (pooler IPv4)    |
+| `DATABASE_URL`                  | Prisma CLI (`db push`/migrations)                  |
+| `DATABASE_DIRECT_URL`           | Prisma migrations avançadas (`directUrl`)          |
 | `EXPO_PUBLIC_SUPABASE_URL`      | Mobile                                              |
 | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Mobile                                              |
 | `EXPO_PUBLIC_API_URL`           | Mobile (sem `/api`, o app adiciona automaticamente) |
@@ -90,13 +92,22 @@ Swagger local: `http://localhost:3000/docs`
 
 ## Scripts úteis (raiz)
 
-- `npm run dev` → Supabase + backend + mobile (emulador)
-- `npm run dev:all` → Supabase + backend + mobile (modo start padrão)
-- `npm run dev:services` → Supabase + backend
+- `npm run dev` → backend + mobile (emulador)
+- `npm run dev:all` → backend + mobile (modo start padrão)
+- `npm run dev:services` → apenas backend
 - `npm run dev:backend` → apenas backend
 - `npm run dev:mobile` → apenas mobile
-- `npm run supabase:start|status|stop`
+- `npm run docker:up|docker:down|docker:logs`
 - `npm run lint`, `npm run typecheck`, `npm run test`, `npm run test:e2e`
+
+
+## Docker
+
+O projeto inclui dockerização completa dos serviços de app:
+
+- `docker compose up -d` sobe backend e mobile
+- `docker compose down` encerra os containers
+- `docker compose -f docker-compose.ci.yml up -d postgres` sobe somente o Postgres usado em testes e2e/CI
 
 ## Documentação detalhada
 
@@ -106,6 +117,7 @@ Swagger local: `http://localhost:3000/docs`
 - estratégia de testes: `docs/testing-strategy.md`
 - plano de entrega: `docs/delivery-plan.md`
 - guia interno de execução: `docs/internal-execution-guide.md`
+- guia completo de setup (clone até execução): `docs/guia-setup-completo.md`
 
 ## Regra de manutenção da documentação
 

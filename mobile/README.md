@@ -43,7 +43,7 @@ O app adiciona `/api` automaticamente no cliente HTTP.
 
 Na raiz do monorepo:
 
-- `npm run dev` → fluxo completo recomendado (supabase + backend + mobile emulador)
+- `npm run dev` → fluxo completo recomendado (backend + mobile emulador, usando Supabase Cloud)
 - `npm run dev:mobile` → apenas Expo start
 - `npm run dev:mobile:emulator` → Expo localhost (bom para emulador)
 - `npm run dev:mobile:android` → tenta abrir Android automaticamente

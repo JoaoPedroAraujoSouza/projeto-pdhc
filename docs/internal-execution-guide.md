@@ -99,7 +99,7 @@ Este documento serve como guia pessoal de execução do projeto. Ele organiza as
 ## Parent issues sugeridas
 1. Setup inicial do projeto
 2. Documentação base do MVP
-3. Configuração de autenticação com Supabase local
+3. Configuração de autenticação com Supabase Cloud
 4. Backend — especialidades
 5. Backend — profissionais
 6. Backend — pacientes
@@ -128,8 +128,8 @@ Este documento serve como guia pessoal de execução do projeto. Ele organiza as
 - escrever `delivery-plan.md`
 - escrever `internal-execution-guide.md`
 
-### 3. Configuração de autenticação com Supabase local
-- subir Supabase local
+### 3. Configuração de autenticação com Supabase Cloud
+- configurar credenciais do Supabase Cloud
 - configurar variáveis de ambiente
 - implementar login e cadastro no mobile
 - validar token no Nest

@@ -6,7 +6,7 @@ API do projeto PDHC responsável por autenticação (validação de token), regr
 
 - Node.js LTS
 - npm
-- Supabase local ativo (`npx supabase start`)
+- Acesso ao projeto Supabase Cloud (Auth + Postgres)
 
 ## Configuração de ambiente
 
@@ -25,7 +25,9 @@ cp .env.example .env
 - `SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_JWT_SECRET`
+- `DATABASE_POOLER_URL` (preferencial para runtime do backend)
 - `DATABASE_URL`
+- `DATABASE_DIRECT_URL` (recomendado para `prisma db push`/migrations)
 
 ## Endereços locais
 
@@ -47,13 +49,14 @@ No diretório `backend/` (se preferir execução direta):
 - `npm run build`
 - `npm run test`
 - `npm run test:e2e`
+- `npm run prisma:db:push`
 - `npm run prisma:migrate:status`
 - `npm run prisma:migrate:dev`
 - `npm run prisma:studio`
 
 ## Fluxo recomendado
 
-1. `npm run supabase:start`
+1. Configure `.env` com credenciais do Supabase Cloud
 2. `npm run dev:backend`
 3. acessar `http://localhost:3000/docs`
 
@@ -66,6 +69,9 @@ No diretório `backend/` (se preferir execução direta):
 
 ### erro de banco (Prisma)
 
-- confirmar Supabase ativo
-- validar `DATABASE_URL` com porta `54322`
+- validar conectividade com o banco do Supabase Cloud
+- em Docker/Windows, use `DATABASE_POOLER_URL` com pooler (`:6543`) para evitar erro de rede IPv6 no runtime
+- use `DATABASE_URL`/`DATABASE_DIRECT_URL` (porta `5432`) para `prisma db push` e migrations
+- se ocorrer `P1000`, valide usuário/host (pooler usa `postgres.<project-ref>`; conexão direta usa `postgres`)
+- se ocorrer `P1011` com `self-signed certificate in certificate chain`, valide cadeia TLS do ambiente; para diagnóstico em rede corporativa, teste `sslmode=no-verify`
 - rodar `npm --prefix backend run prisma:migrate:status`
