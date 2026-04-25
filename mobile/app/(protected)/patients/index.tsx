@@ -24,6 +24,7 @@ import { PatientsInlineError } from '@/components/patients/PatientsInlineError';
 import { PatientsLoadErrorState } from '@/components/patients/PatientsLoadErrorState';
 import { PatientsLoadingState } from '@/components/patients/PatientsLoadingState';
 import { AppButton } from '@/components/ui/AppButton';
+import { ConfirmActionModal } from '@/components/ui/ConfirmActionModal';
 import { FAB } from '@/components/ui/FAB';
 import { ProfessionalsHeader } from '@/components/professionals/ProfessionalsHeader';
 import {
@@ -32,6 +33,7 @@ import {
   type PatientFormRawValues,
 } from '@/schemas/patients/patient-form-schema';
 import { createPatient } from '@/services/patients/create-patient';
+import { deletePatient } from '@/services/patients/delete-patient';
 import { listPatients } from '@/services/patients/list-patients';
 import { colors } from '@/styles/colors';
 import type { Patient } from '@/types/patient';
@@ -41,6 +43,8 @@ export default function PatientsScreen() {
   const [isLoadingList, setIsLoadingList] = useState(true);
   const [isRefreshingList, setIsRefreshingList] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState<Patient | null>(null);
+  const [isDeletingPatient, setIsDeletingPatient] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
 
@@ -85,6 +89,52 @@ export default function PatientsScreen() {
       setIsSubmitting(false);
     }
   }
+
+  const handleDeletePatient = useCallback((patient: Patient) => {
+    setPatientToDelete(patient);
+  }, []);
+
+  const handleCancelDelete = useCallback(() => {
+    if (isDeletingPatient) {
+      return;
+    }
+
+    setPatientToDelete(null);
+  }, [isDeletingPatient]);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!patientToDelete) {
+      return;
+    }
+
+    try {
+      setIsDeletingPatient(true);
+      await deletePatient(patientToDelete.id);
+      setPatientToDelete(null);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Paciente excluído',
+        text2: 'O paciente foi removido com sucesso.',
+      });
+
+      setPatients((current) =>
+        current.filter((item) => item.id !== patientToDelete.id),
+      );
+    } catch (error) {
+      setPatientToDelete(null);
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível excluir',
+        text2: getErrorMessage(
+          error,
+          'Verifique se não há consulta agendada ou confirmada.',
+        ),
+      });
+    } finally {
+      setIsDeletingPatient(false);
+    }
+  }, [patientToDelete]);
 
   const hasPatients = patients.length > 0;
 
@@ -186,6 +236,20 @@ export default function PatientsScreen() {
             </View>
           </Modal>
 
+          <ConfirmActionModal
+            visible={Boolean(patientToDelete)}
+            title="Excluir paciente"
+            message="Tem certeza que deseja excluir"
+            highlightText={patientToDelete?.fullName}
+            cancelLabel="Cancelar"
+            confirmLabel="Excluir"
+            isLoading={isDeletingPatient}
+            onCancel={handleCancelDelete}
+            onConfirm={() => {
+              void handleConfirmDelete();
+            }}
+          />
+
           <View style={styles.listSection}>
             <View style={styles.listHeader}>
               <Text style={styles.listTitle}>Lista de pacientes</Text>
@@ -229,6 +293,7 @@ export default function PatientsScreen() {
                     onEditPress={() =>
                       router.push(`./patients/${item.id}/edit`)
                     }
+                    onDeletePress={() => handleDeletePatient(item)}
                   />
                 )}
                 refreshing={isRefreshingList}

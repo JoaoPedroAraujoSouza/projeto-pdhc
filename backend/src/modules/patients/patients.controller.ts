@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -11,10 +13,12 @@ import {
   ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnprocessableEntityResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { SupabaseAuthGuard } from '../auth/guards/supabase-auth.guard';
@@ -84,5 +88,18 @@ export class PatientsController {
     @Body() updatePatientDto: UpdatePatientDto,
   ): Promise<PatientResponseDto> {
     return this.patientsService.update(id, updatePatientDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Delete a patient by id' })
+  @ApiNoContentResponse({ description: 'Patient deleted successfully' })
+  @ApiNotFoundResponse({ description: 'Patient not found' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Patient has appointments with status scheduled or confirmed',
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid bearer token' })
+  async remove(@Param('id') id: string): Promise<void> {
+    await this.patientsService.remove(id);
   }
 }

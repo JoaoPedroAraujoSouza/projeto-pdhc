@@ -7,11 +7,13 @@ import { colors } from '@/styles/colors';
 type PatientListItemProps = {
   patient: Patient;
   onEditPress: () => void;
+  onDeletePress: () => void;
 };
 
 export function PatientListItem({
   patient,
   onEditPress,
+  onDeletePress,
 }: PatientListItemProps) {
   return (
     <View style={styles.container}>
@@ -20,14 +22,25 @@ export function PatientListItem({
         <Text style={styles.detail}>CPF: {patient.cpf}</Text>
       </View>
 
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={onEditPress}
-        style={styles.editButton}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-      >
-        <Ionicons name="pencil-outline" size={18} color={colors.primary} />
-      </TouchableOpacity>
+      <View style={styles.actions}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={onEditPress}
+          style={styles.editButton}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Ionicons name="pencil-outline" size={18} color={colors.primary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={onDeletePress}
+          style={styles.deleteButton}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Ionicons name="trash-outline" size={18} color={colors.danger} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -58,6 +71,20 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   editButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.inputBackground,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  deleteButton: {
     width: 36,
     height: 36,
     borderRadius: 10,
